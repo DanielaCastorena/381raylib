@@ -27,7 +27,7 @@ int main(){
     Font font = LoadFont("resources/cursive.ttf");
 
     //background image
-    Texture2D background = LoadTexture("resources/wallpaper.jpeg"); 
+    Texture2D background = LoadTexture("resources/background.jpg"); 
 
     float textScale = 1.0f;
 
