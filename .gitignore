@@ -1,1 +1,13 @@
+#ignore build directories
+build/
+bin/
+out/
+
+#ignore generated files
+*.o
+*.exe
+*.out
+*.so
+*.dll
+*.a
 
