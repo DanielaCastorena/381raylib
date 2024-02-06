@@ -1,6 +1,6 @@
 #381raylib - Assignment 0
 
-This project demonstrates a simple text animation using the Raylib library.
+This project demonstrates a simple window text animation using the Raylib library.
 
 ##Git Submodules
 
