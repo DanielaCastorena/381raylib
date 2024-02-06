@@ -24,13 +24,12 @@ int main(){
     SetTargetFPS(60);
 
     //ttf font & convert it to raylib font
-    Font font = LoadFontEx("cursive.ttf", 32, 0, FONT_BITMAP);
-    SetTextureFilter(font.texture, TEXTURE_FILTER_BILINEAR);
+    Font font = LoadFont("resources/cursive.ttf");
 
     //background image
-    Texture2D background = LoadTexture("hellokitty.jpeg"); 
+    Texture2D background = LoadTexture("resources/wallpaper.jpeg"); 
 
-    float textScale = 20.0f;
+    float textScale = 1.0f;
 
     while (!WindowShouldClose()){
         if (IsWindowResized()){
@@ -48,14 +47,14 @@ int main(){
 
         //extra credit! change text color between 3 colors 
         float t = 0.5f + 0.5f * sinf(GetTime()); 
-        Color textColor = LerpColor(LerpColor(PURPLE, PINK, t), BLUE, t);
+        Color textColor = LerpColor(LerpColor(PURPLE, BLUE, t), PINK, t);
 
         BeginDrawing();
         
         //background image
         DrawTexture(background, 0, 0, WHITE);
 
-        ClearBackground(BLACK);
+        ClearBackground(RAYWHITE);
 
         //ttf font
         DrawTextEx(font, textToDisplay, textPosition, textScale, 0, textColor);
@@ -69,6 +68,8 @@ int main(){
     CloseWindow();
     return 0;
 }
+
+
 
 
 
