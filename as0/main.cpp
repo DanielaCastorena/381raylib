@@ -27,9 +27,9 @@ int main(){
     Font font = LoadFont("resources/cursive.ttf");
 
     //background image
-    Texture2D background = LoadTexture("resources/background.jpg"); 
+    Texture2D background = LoadTexture("resources/cute.gif"); 
 
-    float textScale = 1.0f;
+    float textScale = 20.0f;
 
     while (!WindowShouldClose()){
         if (IsWindowResized()){
@@ -39,7 +39,7 @@ int main(){
         }
 
         //extra credit! text animation
-        textScale = 20.0f + 5.0f * sinf(GetTime());
+        textScale = 20.0f + 20.0f * sinf(GetTime());
 
         //center text on screen
         Vector2 textSize = MeasureTextEx(font, textToDisplay, textScale, 0);
@@ -51,12 +51,17 @@ int main(){
 
         BeginDrawing();
         
-        //background image
-        DrawTexture(background, 0, 0, WHITE);
-
+        // Clear the background
         ClearBackground(RAYWHITE);
 
-        //ttf font
+        // Draw the background image centered on the screen
+        float halfTexWidth = background.width / 2.0f;
+        float halfTexHeight = background.height / 2.0f;
+        float posX = screenWidth / 2.0f - halfTexWidth;
+        float posY = screenHeight / 2.0f - halfTexHeight;
+        DrawTexture(background, posX, posY, WHITE);
+
+        // Draw the text
         DrawTextEx(font, textToDisplay, textPosition, textScale, 0, textColor);
 
         EndDrawing();
@@ -68,6 +73,7 @@ int main(){
     CloseWindow();
     return 0;
 }
+
 
 
 
