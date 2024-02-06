@@ -17,7 +17,8 @@ g++ -o as0 main.cpp -lraylib -std=c++11
 
 #raylib must be installed!
 #to compile code:
-"g++ -o as0 main.cpp -lraylib -std=c++11"
+"cd build"
+"make"
 
 #after compiling, run the executable with:
 "./as0"
