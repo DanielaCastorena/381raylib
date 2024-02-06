@@ -27,7 +27,7 @@ int main(){
     Font font = LoadFont("resources/cursive.ttf");
 
     //background image
-    Texture2D background = LoadTexture("resources/cute.gif"); 
+    Texture2D background = LoadTexture("resources/background.gif"); 
 
     float textScale = 20.0f;
 
@@ -47,7 +47,7 @@ int main(){
 
         //extra credit! change text color between 3 colors 
         float t = 0.5f + 0.5f * sinf(GetTime()); 
-        Color textColor = LerpColor(LerpColor(PURPLE, BLUE, t), PINK, t);
+        Color textColor = LerpColor(LerpColor(BROWN, GOLD, t), PINK, t);
 
         BeginDrawing();
         
