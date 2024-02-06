@@ -39,7 +39,7 @@ int main(){
         }
 
         //extra credit! text animation
-        textScale = 20.0f + 20.0f * sinf(GetTime());
+        textScale = 50.0f + 20.0f * sinf(GetTime());
 
         //center text on screen
         Vector2 textSize = MeasureTextEx(font, textToDisplay, textScale, 0);
@@ -51,17 +51,17 @@ int main(){
 
         BeginDrawing();
         
-        // Clear the background
+        //clear background
         ClearBackground(RAYWHITE);
 
-        // Draw the background image centered on the screen
+        //center image on window
         float halfTexWidth = background.width / 2.0f;
         float halfTexHeight = background.height / 2.0f;
         float posX = screenWidth / 2.0f - halfTexWidth;
         float posY = screenHeight / 2.0f - halfTexHeight;
         DrawTexture(background, posX, posY, WHITE);
 
-        // Draw the text
+        //draw text
         DrawTextEx(font, textToDisplay, textPosition, textScale, 0, textColor);
 
         EndDrawing();
