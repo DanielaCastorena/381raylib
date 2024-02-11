@@ -1,113 +1,87 @@
-#include <raylib.h>
-#include <raymath.h>
-#include <cfloat>
+#include "raylib.h"
+#include "raymath.h" // Include this for matrix math functions
 
-//ambda function to translate models
-auto translateModel = [](Model& model, Vector3 translation) {
-    model.transform = MatrixMultiply(model.transform, MatrixTranslate(translation.x, translation.y, translation.z));
-};
+int main(void) {
+    // Initialization
+    const int screenWidth = 800;
+    const int screenHeight = 450;
 
-//lambda function to rotate models
-auto rotateModel = [](Model& model, Vector3 axis, float angle) {
-    model.transform = MatrixMultiply(model.transform, MatrixRotateXYZ(axis));
-};
+    InitWindow(screenWidth, screenHeight, "CS381 - Assignment 1");
 
-//bounding box 
-BoundingBox CalculateModelBoundingBox(Model model, float expansionFactor) {
-    BoundingBox box = { 0 };
+    // Define the camera
+    Camera3D camera = { 0 };
+    camera.position = (Vector3){ 0.0f, 500.0f, 500.0f };
+    camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
+    camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
+    camera.fovy = 45.0f;
 
-    for (int i = 0; i < model.meshCount; i++) {
-        //mesh data
-        Mesh mesh = model.meshes[i];
+    // Load models
+    Model airplane = LoadModel("resources/PolyPlane.glb");
+    Model ship = LoadModel("resources/OilTanker.glb");
 
-        //calculate min & max vertices
-        Vector3 minVertex = { FLT_MAX, FLT_MAX, FLT_MAX };
-        Vector3 maxVertex = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
+    // Set positions, scales, and rotations for airplanes and ships
+    Vector3 airplanePos1 = { 0.0f, 0.0f, 0.0f };
+    Vector3 airplanePos2 = { -100.0f, 100.0f, 0.0f };
+    Vector3 shipPos1 = { 0.0f, 0.0f, 0.0f };
+    Vector3 shipPos2 = { 0.0f, 0.0f, 0.0f };
+    Vector3 shipPos3 = { 0.0f, 100.0f, 0.0f };
 
-        for (int j = 0; j < mesh.vertexCount; j++) {
-            Vector3 vertex = { mesh.vertices[j * 3], mesh.vertices[j * 3 + 1], mesh.vertices[j * 3 + 2] };
-            minVertex = Vector3Min(minVertex, vertex);
-            maxVertex = Vector3Max(maxVertex, vertex);
-        }
+    Vector3 airplaneScale2 = { 1.0f, -1.0f, 1.0f };
+    Vector3 shipScale3 = { 1.0f, 2.0f, 1.0f };
 
-        minVertex = Vector3Subtract(minVertex, (Vector3){expansionFactor, expansionFactor, expansionFactor});
-        maxVertex = Vector3Add(maxVertex, (Vector3){expansionFactor, expansionFactor, expansionFactor});
+    float airplaneYaw2 = 180.0f;
+    float shipYaw2 = 90.0f;
+    float shipYaw3 = 270.0f;
 
-        //expand bounding box
-        box.min = Vector3Min(box.min, minVertex);
-        box.max = Vector3Max(box.max, maxVertex);
-    }
-
-    return box;
-}
-
-int main() {
-    //initialize window
-    InitWindow(800, 600, "CS381 - Assignment 1");
-
-    //load models
-    Model airplane = LoadModel("resources/SmitHouston_Tug.glb");
-    Model ship = LoadModel("resources/SmitHouston_Tug.glb");
-
-    //scale airplane
-    airplane.transform = MatrixMultiply(airplane.transform, MatrixScale(3, 3, 3));
-
-    //rotate ship
-    ship.transform = MatrixMultiply(ship.transform, MatrixRotateXYZ((Vector3){90, 0, 90}));
-
-    //camera function
-    Camera camera = { (Vector3){ 0.0f, 120.0f, -500.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, (Vector3){ 0.0f, 1.0f, 0.0f }, 45.0f, CAMERA_PERSPECTIVE };
-
-    //rotation speeds 
-    float airplaneRotationSpeed = -10.0f;
-    float shipRotationSpeed = -10.0f;
-
-    //main loop
+    // Main game loop
     while (!WindowShouldClose()) {
-
-        //rotate models
-        rotateModel(airplane, (Vector3){0, 1, 0}, airplaneRotationSpeed * GetFrameTime());
-        rotateModel(ship, (Vector3){0, 1, 0}, shipRotationSpeed * GetFrameTime());
-
-        //draw
+        // Draw
         BeginDrawing();
+
         ClearBackground(RAYWHITE);
 
-        //begin 3D mode
         BeginMode3D(camera);
 
-        //draw airplanes
-        translateModel(airplane, (Vector3){ -100, 100, 0 });
-        DrawModel(airplane, (Vector3){ 0, 0, 0 }, 1.0f, WHITE); 
-        BoundingBox airplaneBox1 = CalculateModelBoundingBox(airplane, 2.5f); 
-        DrawBoundingBox(airplaneBox1, GREEN);
+        // Draw airplanes
+        DrawModel(airplane, airplanePos1, 1.0f, WHITE); // Default
+        DrawModel(airplane, airplanePos2, 1.0f, WHITE); // Translated, scaled, and yawed
 
-        translateModel(airplane, (Vector3){ 100, -100, 0 }); 
-        DrawModel(airplane, (Vector3){ 0, 0, 0 }, 1.0f, WHITE); 
-        BoundingBox airplaneBox2 = CalculateModelBoundingBox(airplane, 2.5f); 
-        DrawBoundingBox(airplaneBox2, GREEN);
+        // Draw ships
+        DrawModel(ship, shipPos1, 1.0f, WHITE); // Default
+        DrawModel(ship, shipPos2, 1.0f, WHITE); // Yawed
+        DrawModel(ship, shipPos3, 1.0f, WHITE); // Translated, scaled, and yawed
 
-        //draw ships
-        translateModel(ship, (Vector3){ -200, 0, 0 });
-        DrawModel(ship, (Vector3){ 0, 0, 0 }, 1.0f, WHITE);
-        BoundingBox shipBox1 = CalculateModelBoundingBox(ship, 2.5f); 
-        DrawBoundingBox(shipBox1, GREEN);
+        // Draw bounding boxes
+        DrawBoundingBox(GetMeshBoundingBox(airplane.meshes[0]), RED);
+        DrawBoundingBox(GetMeshBoundingBox(airplane.meshes[0]), RED);
+        DrawBoundingBox(GetMeshBoundingBox(ship.meshes[0]), RED);
+        DrawBoundingBox(GetMeshBoundingBox(ship.meshes[0]), RED);
+        DrawBoundingBox(GetMeshBoundingBox(ship.meshes[0]), RED);
 
-        translateModel(ship, (Vector3){ 200, 0, 0 }); 
-        DrawModel(ship, (Vector3){ 0, 0, 0 }, 1.0f, WHITE);
-        BoundingBox shipBox2 = CalculateModelBoundingBox(ship, 2.5f); 
-        DrawBoundingBox(shipBox2, GREEN);
-
-        //end 3D mode
         EndMode3D();
 
         EndDrawing();
     }
 
-    //cleanup
-    CloseWindow();
+    // De-Initialization
     UnloadModel(airplane);
     UnloadModel(ship);
 
+    CloseWindow(); // Close window and OpenGL context
+
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
