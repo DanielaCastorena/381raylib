@@ -17,21 +17,14 @@ int main(void) {
 
     // Load models
     Model airplane = LoadModel("resources/PolyPlane.glb");
-    Model ship = LoadModel("resources/OilTanker.glb");
+    Model ship = LoadModel("resources/SmitHouston_Tug.glb");
 
     // Set positions, scales, and rotations for airplanes and ships
     Vector3 airplanePos1 = { 0.0f, 0.0f, 0.0f };
     Vector3 airplanePos2 = { -100.0f, 100.0f, 0.0f };
-    Vector3 shipPos1 = { 0.0f, 0.0f, 0.0f };
-    Vector3 shipPos2 = { 0.0f, 0.0f, 0.0f };
-    Vector3 shipPos3 = { 0.0f, 100.0f, 0.0f };
-
-    Vector3 airplaneScale2 = { 1.0f, -1.0f, 1.0f };
-    Vector3 shipScale3 = { 1.0f, 2.0f, 1.0f };
-
-    float airplaneYaw2 = 180.0f;
-    float shipYaw2 = 90.0f;
-    float shipYaw3 = 270.0f;
+    Vector3 shipPos1 = { -200.0f, 0.0f, 0.0f };
+    Vector3 shipPos2 = { 200.0f, 0.0f, 0.0f };
+    Vector3 shipPos3 = { 100.0f, 100.0f, 0.0f };
 
     // Main game loop
     while (!WindowShouldClose()) {
@@ -51,12 +44,23 @@ int main(void) {
         DrawModel(ship, shipPos2, 1.0f, WHITE); // Yawed
         DrawModel(ship, shipPos3, 1.0f, WHITE); // Translated, scaled, and yawed
 
-        // Draw bounding boxes
-        DrawBoundingBox(GetMeshBoundingBox(airplane.meshes[0]), RED);
-        DrawBoundingBox(GetMeshBoundingBox(airplane.meshes[0]), RED);
-        DrawBoundingBox(GetMeshBoundingBox(ship.meshes[0]), RED);
-        DrawBoundingBox(GetMeshBoundingBox(ship.meshes[0]), RED);
-        DrawBoundingBox(GetMeshBoundingBox(ship.meshes[0]), RED);
+        // Draw bounding boxes for airplanes
+        for (int i = 0; i < airplane.meshCount; i++) {
+            Mesh mesh = airplane.meshes[i];
+            BoundingBox bbox = GetMeshBoundingBox(mesh);
+            bbox.min = Vector3Add(bbox.min, i == 0 ? airplanePos1 : airplanePos2);
+            bbox.max = Vector3Add(bbox.max, i == 0 ? airplanePos1 : airplanePos2);
+            DrawBoundingBox(bbox, GREEN);
+        }
+
+        // Draw bounding boxes for ships
+        for (int i = 0; i < ship.meshCount; i++) {
+            Mesh mesh = ship.meshes[i];
+            BoundingBox bbox = GetMeshBoundingBox(mesh);
+            bbox.min = Vector3Add(bbox.min, i == 0 ? shipPos1 : (i == 1 ? shipPos2 : shipPos3));
+            bbox.max = Vector3Add(bbox.max, i == 0 ? shipPos1 : (i == 1 ? shipPos2 : shipPos3));
+            DrawBoundingBox(bbox, GREEN);
+        }
 
         EndMode3D();
 
@@ -71,11 +75,6 @@ int main(void) {
 
     return 0;
 }
-
-
-
-
-
 
 
 
