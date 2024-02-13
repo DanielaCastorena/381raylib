@@ -12,7 +12,7 @@ Clone the repository to your local machine using Git:
 Navigate to the cloned directory:
 "cd as1"
 "cd build"
-"main"
+"make"
 "./as0"
 
 This code is written using the C programming language.

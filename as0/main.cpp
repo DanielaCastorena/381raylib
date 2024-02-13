@@ -1,3 +1,6 @@
+//Daniela Castorena
+//AS0
+
 #include "raylib.h"
 #include <cmath>
 
