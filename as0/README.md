@@ -9,8 +9,10 @@ This project demonstrates a simple window text animation using the Raylib librar
 To fetch Git submodules for this project, execute the following command:
 
 ```bash
+"cd Desktop"
 git clone https://github.com/DanielaCastorena/381raylib.git
 
+"
 #raylib must be installed!
 #to compile code:
 "cd as0"

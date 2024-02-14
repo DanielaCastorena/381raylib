@@ -1,4 +1,4 @@
-# Install script for directory: /Users/daniela_castorena/Github/381raylib/as0
+# Install script for directory: /Users/daniela_castorena/GitHub/381raylib/as2
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/daniela_castorena/Github/381raylib/as0/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/daniela_castorena/GitHub/381raylib/as2/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

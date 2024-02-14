@@ -1,0 +1,3 @@
+/Users/daniela_castorena/GitHub/381raylib/as2/build/CMakeFiles/as0.dir
+/Users/daniela_castorena/GitHub/381raylib/as2/build/CMakeFiles/edit_cache.dir
+/Users/daniela_castorena/GitHub/381raylib/as2/build/CMakeFiles/rebuild_cache.dir
