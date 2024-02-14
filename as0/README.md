@@ -9,14 +9,11 @@ This project demonstrates a simple window text animation using the Raylib librar
 To fetch Git submodules for this project, execute the following command:
 
 ```bash
-git submodule update --init --recursive
-
-#initialize and update submodules
-git submodule update --init --recursive
-g++ -o as0 main.cpp -lraylib -std=c++11
+git clone https://github.com/DanielaCastorena/381raylib.git
 
 #raylib must be installed!
 #to compile code:
+"cd as0"
 "cd build"
 "make"
 
