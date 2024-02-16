@@ -11,6 +11,7 @@ Clone the repository to your local machine using Git:
 "git clone https://github.com/DanielaCastorena/381raylib.git"
 
 "cd 381raylib"
+
 Navigate to the cloned directory:
 "cd as1"
 "cd build"
