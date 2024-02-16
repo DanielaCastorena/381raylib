@@ -27,10 +27,10 @@ int main(){
     SetTargetFPS(60);
 
     //ttf font & convert it to raylib font
-    Font font = LoadFont("resources/cursive.ttf");
+    Font font = LoadFont("resources/resources/cursive.ttf");
 
     //background image
-    Texture2D background = LoadTexture("resources/background.gif"); 
+    Texture2D background = LoadTexture("resources/resources/background.gif"); 
 
     float textScale = 20.0f;
 

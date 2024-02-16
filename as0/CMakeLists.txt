@@ -22,4 +22,10 @@ add_executable(as0 main.cpp)
 #link raylib and GLFW libraries
 target_link_libraries(as0 raylib glfw)
 
+# Define source and destination paths for meshes
+set(RESOURCES_SOURCE_DIR ${CMAKE_SOURCE_DIR}/resources)
+set(RESOURCES_DEST_DIR ${CMAKE_BINARY_DIR}/resources)
+
+# Copy meshes to build directory during build
+file(COPY ${RESOURCES_SOURCE_DIR} DESTINATION ${RESOURCES_DEST_DIR})
 
