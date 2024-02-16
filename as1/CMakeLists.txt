@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(as0)
+project(as1)
 
 # Set C++ standard to C++11
 set(CMAKE_CXX_STANDARD 11)
@@ -14,10 +14,10 @@ include_directories(${RAYLIB_DIR}/include)
 link_directories(${RAYLIB_DIR}/lib)
 
 # Create executable
-add_executable(as0 main.cpp)
+add_executable(as1 main.cpp)
 
 # Link raylib library
-target_link_libraries(as0 raylib)
+target_link_libraries(as1 raylib)
 
 # Define source and destination paths for meshes
 set(MESHES_SOURCE_DIR ${CMAKE_SOURCE_DIR}/meshes)

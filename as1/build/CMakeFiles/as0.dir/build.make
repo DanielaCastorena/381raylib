@@ -92,7 +92,6 @@ as0_EXTERNAL_OBJECTS =
 
 as0: CMakeFiles/as0.dir/main.cpp.o
 as0: CMakeFiles/as0.dir/build.make
-as0: /opt/homebrew/lib/libglfw.3.3.dylib
 as0: CMakeFiles/as0.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/daniela_castorena/GitHub/381raylib/as1/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable as0"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/as0.dir/link.txt --verbose=$(VERBOSE)

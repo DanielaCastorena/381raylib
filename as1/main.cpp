@@ -16,8 +16,8 @@ int main(void) {
     camera.fovy = 45.0f;
 
     // Load models
-    Model airplane = LoadModel("as1/meshes/PolyPlane.glb");
-    Model ship = LoadModel("as1/meshes/SmitHouston_Tug.glb");
+    Model airplane = LoadModel("meshes/meshes/PolyPlane.glb");
+    Model ship = LoadModel("meshes/meshes/SmitHouston_Tug.glb");
 
     // Initial positions for airplanes & ships per instructions
     Vector3 airplanePos1 = { 0.0f, 0.0f, 0.0f };

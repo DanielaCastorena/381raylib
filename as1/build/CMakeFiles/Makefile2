@@ -63,7 +63,7 @@ CMAKE_BINARY_DIR = /Users/daniela_castorena/GitHub/381raylib/as1/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/as0.dir/all
+all: CMakeFiles/as1.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -71,34 +71,34 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/as0.dir/clean
+clean: CMakeFiles/as1.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/as0.dir
+# Target rules for target CMakeFiles/as1.dir
 
 # All Build rule for target.
-CMakeFiles/as0.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/as0.dir/build.make CMakeFiles/as0.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/as0.dir/build.make CMakeFiles/as0.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/daniela_castorena/GitHub/381raylib/as1/build/CMakeFiles --progress-num=1,2 "Built target as0"
-.PHONY : CMakeFiles/as0.dir/all
+CMakeFiles/as1.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/as1.dir/build.make CMakeFiles/as1.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/as1.dir/build.make CMakeFiles/as1.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/daniela_castorena/GitHub/381raylib/as1/build/CMakeFiles --progress-num=1,2 "Built target as1"
+.PHONY : CMakeFiles/as1.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/as0.dir/rule: cmake_check_build_system
+CMakeFiles/as1.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/daniela_castorena/GitHub/381raylib/as1/build/CMakeFiles 2
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/as0.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/as1.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/daniela_castorena/GitHub/381raylib/as1/build/CMakeFiles 0
-.PHONY : CMakeFiles/as0.dir/rule
+.PHONY : CMakeFiles/as1.dir/rule
 
 # Convenience name for target.
-as0: CMakeFiles/as0.dir/rule
-.PHONY : as0
+as1: CMakeFiles/as1.dir/rule
+.PHONY : as1
 
 # clean rule for target.
-CMakeFiles/as0.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/as0.dir/build.make CMakeFiles/as0.dir/clean
-.PHONY : CMakeFiles/as0.dir/clean
+CMakeFiles/as1.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/as1.dir/build.make CMakeFiles/as1.dir/clean
+.PHONY : CMakeFiles/as1.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

@@ -32,10 +32,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/opt/homebrew/Cellar/cmake/3.28.2/share/cmake/Modules/Platform/Darwin-Initialize.cmake"
   "/opt/homebrew/Cellar/cmake/3.28.2/share/cmake/Modules/Platform/Darwin.cmake"
   "/opt/homebrew/Cellar/cmake/3.28.2/share/cmake/Modules/Platform/UnixPaths.cmake"
-  "/opt/homebrew/lib/cmake/glfw3/glfw3Config.cmake"
-  "/opt/homebrew/lib/cmake/glfw3/glfw3ConfigVersion.cmake"
-  "/opt/homebrew/lib/cmake/glfw3/glfw3Targets-release.cmake"
-  "/opt/homebrew/lib/cmake/glfw3/glfw3Targets.cmake"
   )
 
 # The corresponding makefile is:
@@ -51,5 +47,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/as0.dir/DependInfo.cmake"
+  "CMakeFiles/as1.dir/DependInfo.cmake"
   )
