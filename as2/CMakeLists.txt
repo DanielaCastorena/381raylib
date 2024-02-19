@@ -4,6 +4,10 @@ project(as0)
 #set C++ standard to C++11
 set(CMAKE_CXX_STANDARD 11)
 
+add_subdirectory(raylib-cpp)
+
+file(GLOB sources "src/*.cpp" "src/*.c")
+
 #specify the path to raylib library
 set(RAYLIB_DIR "/opt/homebrew/Cellar/raylib/5.0")
 
