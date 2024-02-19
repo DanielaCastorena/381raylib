@@ -57,13 +57,33 @@ RM = /opt/homebrew/Cellar/cmake/3.28.2/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/daniela_castorena/GitHub/381raylib/as2
+CMAKE_SOURCE_DIR = /Users/daniela_castorena/Desktop/381raylib/as2
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/daniela_castorena/GitHub/381raylib/as2/build
+CMAKE_BINARY_DIR = /Users/daniela_castorena/Desktop/381raylib/as2/build
 
 #=============================================================================
 # Targets provided globally by CMake.
+
+# Special rule for the target package
+package: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Run CPack packaging tool..."
+	/opt/homebrew/Cellar/cmake/3.28.2/bin/cpack --config ./CPackConfig.cmake
+.PHONY : package
+
+# Special rule for the target package
+package/fast: package
+.PHONY : package/fast
+
+# Special rule for the target package_source
+package_source:
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Run CPack packaging tool for source..."
+	/opt/homebrew/Cellar/cmake/3.28.2/bin/cpack --config ./CPackSourceConfig.cmake /Users/daniela_castorena/Desktop/381raylib/as2/build/CPackSourceConfig.cmake
+.PHONY : package_source
+
+# Special rule for the target package_source
+package_source/fast: package_source
+.PHONY : package_source/fast
 
 # Special rule for the target edit_cache
 edit_cache:
@@ -85,11 +105,56 @@ rebuild_cache:
 rebuild_cache/fast: rebuild_cache
 .PHONY : rebuild_cache/fast
 
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+.PHONY : list_install_components/fast
+
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Install the project..."
+	/opt/homebrew/Cellar/cmake/3.28.2/bin/cmake -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Install the project..."
+	/opt/homebrew/Cellar/cmake/3.28.2/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
+
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing only the local directory..."
+	/opt/homebrew/Cellar/cmake/3.28.2/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing only the local directory..."
+	/opt/homebrew/Cellar/cmake/3.28.2/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
+
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing the project stripped..."
+	/opt/homebrew/Cellar/cmake/3.28.2/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
+
+# Special rule for the target install/strip
+install/strip/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing the project stripped..."
+	/opt/homebrew/Cellar/cmake/3.28.2/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip/fast
+
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/daniela_castorena/GitHub/381raylib/as2/build/CMakeFiles /Users/daniela_castorena/GitHub/381raylib/as2/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/daniela_castorena/Desktop/381raylib/as2/build/CMakeFiles /Users/daniela_castorena/Desktop/381raylib/as2/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/daniela_castorena/GitHub/381raylib/as2/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/daniela_castorena/Desktop/381raylib/as2/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -117,41 +182,119 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named as0
+# Target rules for targets named as2
 
 # Build rule for target.
-as0: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 as0
-.PHONY : as0
+as2: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 as2
+.PHONY : as2
 
 # fast build rule for target.
-as0/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/as0.dir/build.make CMakeFiles/as0.dir/build
-.PHONY : as0/fast
+as2/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/as2.dir/build.make CMakeFiles/as2.dir/build
+.PHONY : as2/fast
 
-main.o: main.cpp.o
-.PHONY : main.o
+#=============================================================================
+# Target rules for targets named raylib
+
+# Build rule for target.
+raylib: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 raylib
+.PHONY : raylib
+
+# fast build rule for target.
+raylib/fast:
+	$(MAKE) $(MAKESILENT) -f raylib-cpp/raylib/raylib/CMakeFiles/raylib.dir/build.make raylib-cpp/raylib/raylib/CMakeFiles/raylib.dir/build
+.PHONY : raylib/fast
+
+#=============================================================================
+# Target rules for targets named glfw
+
+# Build rule for target.
+glfw: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 glfw
+.PHONY : glfw
+
+# fast build rule for target.
+glfw/fast:
+	$(MAKE) $(MAKESILENT) -f raylib-cpp/raylib/raylib/external/glfw/src/CMakeFiles/glfw.dir/build.make raylib-cpp/raylib/raylib/external/glfw/src/CMakeFiles/glfw.dir/build
+.PHONY : glfw/fast
+
+#=============================================================================
+# Target rules for targets named update_mappings
+
+# Build rule for target.
+update_mappings: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 update_mappings
+.PHONY : update_mappings
+
+# fast build rule for target.
+update_mappings/fast:
+	$(MAKE) $(MAKESILENT) -f raylib-cpp/raylib/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/build.make raylib-cpp/raylib/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/build
+.PHONY : update_mappings/fast
+
+#=============================================================================
+# Target rules for targets named buffered-raylib
+
+# Build rule for target.
+buffered-raylib: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 buffered-raylib
+.PHONY : buffered-raylib
+
+# fast build rule for target.
+buffered-raylib/fast:
+	$(MAKE) $(MAKESILENT) -f raylib-cpp/BufferedRaylib/CMakeFiles/buffered-raylib.dir/build.make raylib-cpp/BufferedRaylib/CMakeFiles/buffered-raylib.dir/build
+.PHONY : buffered-raylib/fast
+
+#=============================================================================
+# Target rules for targets named tst
+
+# Build rule for target.
+tst: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tst
+.PHONY : tst
+
+# fast build rule for target.
+tst/fast:
+	$(MAKE) $(MAKESILENT) -f raylib-cpp/BufferedRaylib/CMakeFiles/tst.dir/build.make raylib-cpp/BufferedRaylib/CMakeFiles/tst.dir/build
+.PHONY : tst/fast
+
+#=============================================================================
+# Target rules for targets named libfastsignals
+
+# Build rule for target.
+libfastsignals: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 libfastsignals
+.PHONY : libfastsignals
+
+# fast build rule for target.
+libfastsignals/fast:
+	$(MAKE) $(MAKESILENT) -f raylib-cpp/BufferedRaylib/FastSignals/libfastsignals/CMakeFiles/libfastsignals.dir/build.make raylib-cpp/BufferedRaylib/FastSignals/libfastsignals/CMakeFiles/libfastsignals.dir/build
+.PHONY : libfastsignals/fast
+
+src/main.o: src/main.cpp.o
+.PHONY : src/main.o
 
 # target to build an object file
-main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/as0.dir/build.make CMakeFiles/as0.dir/main.cpp.o
-.PHONY : main.cpp.o
+src/main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/as2.dir/build.make CMakeFiles/as2.dir/src/main.cpp.o
+.PHONY : src/main.cpp.o
 
-main.i: main.cpp.i
-.PHONY : main.i
+src/main.i: src/main.cpp.i
+.PHONY : src/main.i
 
 # target to preprocess a source file
-main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/as0.dir/build.make CMakeFiles/as0.dir/main.cpp.i
-.PHONY : main.cpp.i
+src/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/as2.dir/build.make CMakeFiles/as2.dir/src/main.cpp.i
+.PHONY : src/main.cpp.i
 
-main.s: main.cpp.s
-.PHONY : main.s
+src/main.s: src/main.cpp.s
+.PHONY : src/main.s
 
 # target to generate assembly for a file
-main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/as0.dir/build.make CMakeFiles/as0.dir/main.cpp.s
-.PHONY : main.cpp.s
+src/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/as2.dir/build.make CMakeFiles/as2.dir/src/main.cpp.s
+.PHONY : src/main.cpp.s
 
 # Help Target
 help:
@@ -160,11 +303,23 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
+	@echo "... install"
+	@echo "... install/local"
+	@echo "... install/strip"
+	@echo "... list_install_components"
+	@echo "... package"
+	@echo "... package_source"
 	@echo "... rebuild_cache"
-	@echo "... as0"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
+	@echo "... update_mappings"
+	@echo "... as2"
+	@echo "... buffered-raylib"
+	@echo "... glfw"
+	@echo "... libfastsignals"
+	@echo "... raylib"
+	@echo "... tst"
+	@echo "... src/main.o"
+	@echo "... src/main.i"
+	@echo "... src/main.s"
 .PHONY : help
 
 
