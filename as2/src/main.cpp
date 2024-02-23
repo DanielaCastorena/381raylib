@@ -11,25 +11,24 @@ int main(void)
     InitWindow(screenWidth, screenHeight, "CS381 - Assignment 2");
 
     Camera camera = {0};
-    camera.position = (Vector3){ 0.0f, 50.0f, -600.0f };
+    camera.position = (Vector3){ 0.0f, 30.0f, -700.0f };
     camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
     camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
     camera.fovy = 30.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
     Model model = LoadModel("meshes/meshes/PolyPlane.glb");
-    Texture2D texture = LoadTexture("textures/textures/skybox.png");
-    model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+
+    // Load skybox texture
+    Texture2D skyboxTexture = LoadTexture("textures/textures/skybox.png");
+
+    // Load grass texture
+    Texture2D grassTexture = LoadTexture("textures/textures/grass.jpg");
 
     Vector3 position = { 0.0f, 0.0f, -200.0f };
     float velocity = 0.0f;
     float strafeVelocity = 0.0f;
     float verticalVelocity = 0.0f;
-
-    Texture2D background = LoadTexture("textures/textures/skybox.png");
-
-    // Adjust the skybox position to center it on the screen
-    Vector3 skyboxPosition = {-(float)screenWidth / 2, -(float)screenHeight / 2, 10000.0f}; // Move the skybox further back
 
     SetTargetFPS(60);
 
@@ -65,37 +64,35 @@ int main(void)
         position.y += forwardDirection.y * velocity + rightDirection.y * strafeVelocity + upDirection.y * verticalVelocity;
         position.z += forwardDirection.z * velocity + rightDirection.z * strafeVelocity;
 
-        model.transform = MatrixTranslate(position.x, position.y, position.z);
-
         BeginDrawing();
         {
             ClearBackground(RAYWHITE);
 
             BeginMode3D(camera);
             {
-                // Draw the background quads (skybox) first
-                DrawTexturePro(background, 
-                               (Rectangle){0.0f, 0.0f, (float)background.width, -(float)background.height}, 
-                               (Rectangle){skyboxPosition.x, skyboxPosition.y, (float)screenWidth, (float)screenHeight}, 
+                // Draw the skybox
+                DrawTexturePro(skyboxTexture, 
+                               (Rectangle){0.0f, 0.0f, (float)skyboxTexture.width, -(float)skyboxTexture.height}, 
+                               (Rectangle){-(float)screenWidth / 2, -(float)screenHeight / 2, (float)screenWidth, (float)screenHeight}, 
                                (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
 
-                // Draw the plane model after the skybox
-                DrawModel(model, position, 1.0f, WHITE);
+                DrawModel(model, (Vector3){ position.x, position.y - 20.0f, position.z }, 2.0f, WHITE);
+
+                // Calculate the position to draw the grass texture relative to the camera
+                float grassPosX = camera.position.x - (grassTexture.width / 2);
+                float grassPosY = camera.position.y - 1099; // Move the grass down by 200 units
+
+                // Draw the grass texture
+                DrawTextureRec(grassTexture, (Rectangle){ 0.0f, 0.0f, (float)grassTexture.width, (float)grassTexture.height }, (Vector2){ grassPosX, grassPosY }, WHITE);
             }
             EndMode3D();
-
-            // Draw UI elements
-            DrawRectangle(30, 370, 260, 90, Fade(BLACK, 0.5f));
-            DrawRectangleLines(30, 370, 260, 100, Fade(WHITE, 0.5f));
-            DrawText("In/Out: W | S", 40, 380, 10, WHITE);
-            DrawText("Left/Right: A | D", 40, 400, 10, WHITE);
-            DrawText("Up/Down: Q | E", 40, 420, 10, WHITE);
         }
         EndDrawing();
     }
 
     UnloadModel(model);
-    UnloadTexture(background);
+    UnloadTexture(skyboxTexture);
+    UnloadTexture(grassTexture);
     CloseWindow();
 
     return 0;
