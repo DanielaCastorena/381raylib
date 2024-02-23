@@ -26,3 +26,7 @@ To run the code, execute the compiled executable. Controls:
 - D: Increase velocity to the right of the camera.
 - Q: Increase velocity upwards from the camera's perspective.
 - E: Increase velocity downwards from the camera's perspective.
+
+Question: Can we simplify the problem by remapping camera directions to specific world axes (e.g. W moves along say -Z)? Why or why not can we use this simplification in this assignment?
+
+Answer: Yes, we can simplify the problem by remapping camera directions to specific world axes. We can use this simplification because it enhances user intuitiveness and simplifies control by aligning camera movement with familiar spatial directions. This approach maintains clarity and predictability in navigation, ultimately improving the overall user experience in the 3D environment.
