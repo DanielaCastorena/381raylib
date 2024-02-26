@@ -8,14 +8,14 @@ Clone the repository to your local machine using Git:
 "cd 381raylib"
 
 Navigate to the cloned directory:
-"cd as1"
+"cd as2"
 "git submodule update --init --recursive"
 "rm -r build"
 "mkdir build"
 "cd build"
 "cmake .."
 "make"
-"./as1"
+"./as2"
 
 
 ## Running the Code
