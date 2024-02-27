@@ -34,6 +34,3 @@ set(TEXTURES_DEST_DIR ${CMAKE_BINARY_DIR}/textures)
 
 # Copy meshes to build directory during build
 file(COPY ${TEXTURES_SOURCE_DIR} DESTINATION ${TEXTURES_DEST_DIR})
-
-
-

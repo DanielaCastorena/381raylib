@@ -1,4 +1,4 @@
-# Install script for directory: /home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include
+# Install script for directory: /Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -27,11 +27,6 @@ if(NOT CMAKE_INSTALL_COMPONENT)
   endif()
 endif()
 
-# Install shared libraries without execute permission?
-if(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
-  set(CMAKE_INSTALL_SO_NO_EXE "1")
-endif()
-
 # Is this installation the result of a crosscompile?
 if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
@@ -39,50 +34,50 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "/usr/bin/objdump")
+  set(CMAKE_OBJDUMP "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/objdump")
 endif()
 
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE FILE FILES
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/AudioDevice.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/AudioStream.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/BoundingBox.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Camera2D.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Camera3D.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Color.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Degree.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Font.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Functions.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Gamepad.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Image.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Material.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Matrix.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Mesh.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Model.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/ModelAnimation.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Mouse.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Music.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Ray.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/RayCollision.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/RaylibException.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/raylib-cpp-utils.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/raylib-cpp.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/raylib.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/raymath.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Rectangle.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/RenderTexture.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Shader.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Sound.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Text.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Texture.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/TextureUnmanaged.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Touch.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Vector2.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Vector3.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Vector4.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/VrStereoConfig.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Wave.hpp"
-    "/home/znasif/Assignments/Daniela/381raylib/as1/raylib-cpp/include/Window.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/AudioDevice.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/AudioStream.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/BoundingBox.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Camera2D.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Camera3D.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Color.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Degree.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Font.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Functions.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Gamepad.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Image.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Material.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Matrix.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Mesh.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Model.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/ModelAnimation.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Mouse.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Music.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Ray.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/RayCollision.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/RaylibException.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/raylib-cpp-utils.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/raylib-cpp.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/raylib.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/raymath.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Rectangle.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/RenderTexture.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Shader.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Sound.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Text.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Texture.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/TextureUnmanaged.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Touch.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Vector2.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Vector3.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Vector4.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/VrStereoConfig.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Wave.hpp"
+    "/Users/daniela_castorena/Desktop/381raylib/as1/raylib-cpp/include/Window.hpp"
     )
 endif()
 

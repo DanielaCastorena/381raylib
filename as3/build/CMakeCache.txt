@@ -388,15 +388,6 @@ USE_EXTERNAL_GLFW:STRING=OFF
 WITH_PIC:BOOL=OFF
 
 //Value Computed by CMake
-as2_BINARY_DIR:STATIC=/Users/daniela_castorena/Desktop/381raylib/as3/build
-
-//Value Computed by CMake
-as2_IS_TOP_LEVEL:STATIC=ON
-
-//Value Computed by CMake
-as2_SOURCE_DIR:STATIC=/Users/daniela_castorena/Desktop/381raylib/as3
-
-//Value Computed by CMake
 as3_BINARY_DIR:STATIC=/Users/daniela_castorena/Desktop/381raylib/as3/build
 
 //Value Computed by CMake

@@ -17,7 +17,9 @@ int main(void)
     camera.fovy = 30.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
-    Model model = LoadModel("meshes/meshes/PolyPlane.glb");
+    Model model1 = LoadModel("meshes/meshes/PolyPlane.glb");
+    Model model2 = LoadModel("meshes/meshes/PolyPlane.glb");
+    Model model3 = LoadModel("meshes/meshes/PolyPlane.glb");
 
     // Load skybox texture
     Texture2D skyboxTexture = LoadTexture("textures/textures/skybox.png");
@@ -25,7 +27,10 @@ int main(void)
     // Load grass texture
     Texture2D grassTexture = LoadTexture("textures/textures/grass.jpg");
 
-    Vector3 position = { 0.0f, 0.0f, -200.0f };
+    Vector3 position1 = { 0.0f, 0.0f, -200.0f };
+    Vector3 position2 = { 100.0f, 0.0f, -200.0f };
+    Vector3 position3 = { -100.0f, 0.0f, -200.0f };
+
     float velocity = 0.0f;
     float strafeVelocity = 0.0f;
     float verticalVelocity = 0.0f;
@@ -50,7 +55,7 @@ int main(void)
         else if (IsKeyDown(KEY_E))
             verticalVelocity -= VELOCITY_INCREMENT;
 
-        // Update position based on velocity and camera direction
+        // Update positions based on velocity and camera direction
         Vector3 forwardDirection = Vector3Subtract(camera.target, camera.position);
         forwardDirection = Vector3Normalize(forwardDirection);
 
@@ -60,9 +65,17 @@ int main(void)
         Vector3 upDirection = Vector3CrossProduct(forwardDirection, rightDirection);
         upDirection = Vector3Normalize(upDirection);
 
-        position.x += forwardDirection.x * velocity + rightDirection.x * strafeVelocity;
-        position.y += forwardDirection.y * velocity + rightDirection.y * strafeVelocity + upDirection.y * verticalVelocity;
-        position.z += forwardDirection.z * velocity + rightDirection.z * strafeVelocity;
+        position1.x += forwardDirection.x * velocity + rightDirection.x * strafeVelocity;
+        position1.y += forwardDirection.y * velocity + rightDirection.y * strafeVelocity + upDirection.y * verticalVelocity;
+        position1.z += forwardDirection.z * velocity + rightDirection.z * strafeVelocity;
+
+        position2.x += forwardDirection.x * velocity + rightDirection.x * strafeVelocity;
+        position2.y += forwardDirection.y * velocity + rightDirection.y * strafeVelocity + upDirection.y * verticalVelocity;
+        position2.z += forwardDirection.z * velocity + rightDirection.z * strafeVelocity;
+
+        position3.x += forwardDirection.x * velocity + rightDirection.x * strafeVelocity;
+        position3.y += forwardDirection.y * velocity + rightDirection.y * strafeVelocity + upDirection.y * verticalVelocity;
+        position3.z += forwardDirection.z * velocity + rightDirection.z * strafeVelocity;
 
         BeginDrawing();
         {
@@ -76,7 +89,10 @@ int main(void)
                                (Rectangle){-(float)screenWidth / 2, -(float)screenHeight / 2, (float)screenWidth, (float)screenHeight}, 
                                (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
 
-                DrawModel(model, (Vector3){ position.x, position.y - 20.0f, position.z }, 2.0f, WHITE);
+                // Draw the models (planes)
+                DrawModel(model1, position1, 2.0f, WHITE);
+                DrawModel(model2, position2, 2.0f, WHITE);
+                DrawModel(model3, position3, 2.0f, WHITE);
 
                 // Calculate the position to draw the grass texture relative to the camera
                 float grassPosX = camera.position.x - (grassTexture.width / 2);
@@ -90,11 +106,15 @@ int main(void)
         EndDrawing();
     }
 
-    UnloadModel(model);
+    UnloadModel(model1);
+    UnloadModel(model2);
+    UnloadModel(model3);
     UnloadTexture(skyboxTexture);
     UnloadTexture(grassTexture);
     CloseWindow();
 
     return 0;
 }
+
+
 
