@@ -17,9 +17,7 @@ int main(void)
     camera.fovy = 30.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
-    Model model1 = LoadModel("meshes/meshes/PolyPlane.glb");
-    Model model2 = LoadModel("meshes/meshes/PolyPlane.glb");
-    Model model3 = LoadModel("meshes/meshes/PolyPlane.glb");
+    Model model = LoadModel("meshes/meshes/PolyPlane.glb");
 
     // Load skybox texture
     Texture2D skyboxTexture = LoadTexture("textures/textures/skybox.png");
@@ -90,9 +88,7 @@ int main(void)
                                (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
 
                 // Draw the models (planes)
-                DrawModel(model1, position1, 2.0f, WHITE);
-                DrawModel(model2, position2, 2.0f, WHITE);
-                DrawModel(model3, position3, 2.0f, WHITE);
+                DrawModel(model, position1, 2.0f, WHITE);
 
                 // Calculate the position to draw the grass texture relative to the camera
                 float grassPosX = camera.position.x - (grassTexture.width / 2);
@@ -106,9 +102,7 @@ int main(void)
         EndDrawing();
     }
 
-    UnloadModel(model1);
-    UnloadModel(model2);
-    UnloadModel(model3);
+    UnloadModel(model);
     UnloadTexture(skyboxTexture);
     UnloadTexture(grassTexture);
     CloseWindow();

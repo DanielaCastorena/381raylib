@@ -388,15 +388,6 @@ USE_EXTERNAL_GLFW:STRING=OFF
 WITH_PIC:BOOL=OFF
 
 //Value Computed by CMake
-as0_BINARY_DIR:STATIC=/Users/daniela_castorena/Desktop/381raylib/as2/build
-
-//Value Computed by CMake
-as0_IS_TOP_LEVEL:STATIC=ON
-
-//Value Computed by CMake
-as0_SOURCE_DIR:STATIC=/Users/daniela_castorena/Desktop/381raylib/as2
-
-//Value Computed by CMake
 as2_BINARY_DIR:STATIC=/Users/daniela_castorena/Desktop/381raylib/as2/build
 
 //Value Computed by CMake
@@ -404,9 +395,6 @@ as2_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
 as2_SOURCE_DIR:STATIC=/Users/daniela_castorena/Desktop/381raylib/as2
-
-//The directory containing a CMake configuration file for glfw3.
-glfw3_DIR:PATH=/opt/homebrew/lib/cmake/glfw3
 
 //Dependencies for the target
 libfastsignals_LIB_DEPENDS:STATIC=general;c++experimental;general;pthread;
