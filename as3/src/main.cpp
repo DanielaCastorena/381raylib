@@ -1,15 +1,19 @@
 #include "raylib.h"
 #include "raymath.h"
 
-#define VELOCITY_INCREMENT 0.001f
+#define VELOCITY_INCREMENT 0.01f
 #define BOUNDING_BOX_SCALE_FACTOR 2.0f
 
 typedef struct{
     Model model;
     Vector3 position;
+    Vector3 velocity;
+    float heading;
     float width;
     float height;
     float depth;
+    Sound engineSound;
+    bool isMoving;
 } Plane;
 
 int main(void){
@@ -25,70 +29,62 @@ int main(void){
     camera.fovy = 30.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
-    //skybox texture
     Texture2D skyboxTexture = LoadTexture("textures/textures/skybox.png");
-
-    //grass texture
     Texture2D grassTexture = LoadTexture("textures/textures/grass.jpg");
 
     //create and initialize planes
     Plane planes[3];
-    planes[0].model = LoadModel("meshes/meshes/PolyPlane.glb");
-    planes[1].model = LoadModel("meshes/meshes/PolyPlane.glb");
-    planes[2].model = LoadModel("meshes/meshes/PolyPlane.glb");
-
-    planes[0].position = (Vector3){ 0.0f, 0.0f, -200.0f };
-    planes[1].position = (Vector3){ 100.0f, 0.0f, -200.0f };
-    planes[2].position = (Vector3){ -100.0f, 0.0f, -200.0f };
+    float planeSpacing = 100.0f; // Increased spacing between planes
+    float planeHeight = 5.0f; // Adjust the height of planes above the ground
 
     for (int i = 0; i < 3; i++){
+        planes[i].model = LoadModel("meshes/meshes/PolyPlane.glb");
+        planes[i].position = (Vector3){ -planeSpacing + i * planeSpacing, planeHeight, -200.0f }; // Adjusted initial positions with increased spacing and lower height
         planes[i].width = 10.0f;
         planes[i].height = 10.0f;
         planes[i].depth = 10.0f;
+        planes[i].velocity = (Vector3){0.0f, 0.0f, 0.0f};
+        planes[i].heading = 0.0f;
+        planes[i].engineSound = LoadSound("sounds/engine.wav");
+        planes[i].isMoving = false;
     }
-
-    float velocity = 0.0f;
-    float strafeVelocity = 0.0f;
-    float verticalVelocity = 0.0f;
 
     int selectedPlaneIndex = 0; 
 
     SetTargetFPS(60);
 
     while (!WindowShouldClose()){
-        //keyboard input
         if (IsKeyDown(KEY_W))
-            velocity += VELOCITY_INCREMENT;
+            planes[selectedPlaneIndex].velocity.x += VELOCITY_INCREMENT;
         else if (IsKeyDown(KEY_S))
-            velocity -= VELOCITY_INCREMENT;
+            planes[selectedPlaneIndex].velocity.x -= VELOCITY_INCREMENT;
 
         if (IsKeyDown(KEY_D))
-            strafeVelocity -= VELOCITY_INCREMENT;
+            planes[selectedPlaneIndex].heading -= VELOCITY_INCREMENT;
         else if (IsKeyDown(KEY_A))
-            strafeVelocity += VELOCITY_INCREMENT;
+            planes[selectedPlaneIndex].heading += VELOCITY_INCREMENT;
 
-        if (IsKeyDown(KEY_Q))
-            verticalVelocity += VELOCITY_INCREMENT;
-        else if (IsKeyDown(KEY_E))
-            verticalVelocity -= VELOCITY_INCREMENT;
+        if (IsKeyDown(KEY_SPACE)) {
+            planes[selectedPlaneIndex].velocity = (Vector3){0.0f, 0.0f, 0.0f}; // Stop the selected plane
+            planes[selectedPlaneIndex].isMoving = false; // Update moving flag
+            StopSound(planes[selectedPlaneIndex].engineSound); // Stop engine sound
+        }
 
-        //selection when tab key is pressed
+        // Update positions based on velocity
+        for (int i = 0; i < 3; i++){
+            planes[i].position.x += planes[i].velocity.x;
+            planes[i].position.y += planes[i].velocity.y;
+            planes[i].position.z += planes[i].velocity.z;
+        }
+
+        // Update selected plane's position based on heading
+        Vector3 forwardDirection = {sinf(planes[selectedPlaneIndex].heading), 0.0f, cosf(planes[selectedPlaneIndex].heading)};
+        planes[selectedPlaneIndex].position.x += forwardDirection.x * planes[selectedPlaneIndex].velocity.x;
+        planes[selectedPlaneIndex].position.z += forwardDirection.z * planes[selectedPlaneIndex].velocity.x;
+
         if (IsKeyPressed(KEY_TAB)){
             selectedPlaneIndex = (selectedPlaneIndex + 1) % 3; 
         }
-
-        Vector3 forwardDirection = Vector3Subtract(camera.target, camera.position);
-        forwardDirection = Vector3Normalize(forwardDirection);
-
-        Vector3 rightDirection = Vector3CrossProduct(camera.up, forwardDirection);
-        rightDirection = Vector3Normalize(rightDirection);
-
-        Vector3 upDirection = Vector3CrossProduct(forwardDirection, rightDirection);
-        upDirection = Vector3Normalize(upDirection);
-
-        planes[selectedPlaneIndex].position.x += forwardDirection.x * velocity + rightDirection.x * strafeVelocity;
-        planes[selectedPlaneIndex].position.y += forwardDirection.y * velocity + rightDirection.y * strafeVelocity + upDirection.y * verticalVelocity;
-        planes[selectedPlaneIndex].position.z += forwardDirection.z * velocity + rightDirection.z * strafeVelocity;
 
         BeginDrawing();
         {
@@ -96,18 +92,15 @@ int main(void){
 
             BeginMode3D(camera);
             {
-                //skybox
                 DrawTexturePro(skyboxTexture, 
                                (Rectangle){0.0f, 0.0f, (float)skyboxTexture.width, -(float)skyboxTexture.height}, 
                                (Rectangle){-(float)screenWidth / 2, -(float)screenHeight / 2, (float)screenWidth, (float)screenHeight}, 
                                (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
 
-                //planes
                 for (int i = 0; i < 3; i++){
                     DrawModel(planes[i].model, planes[i].position, 2.0f, WHITE);
                 }
 
-                //bounding box around the selected plane
                 DrawBoundingBox((BoundingBox){
                     (Vector3){ planes[selectedPlaneIndex].position.x - planes[selectedPlaneIndex].width / 1 * BOUNDING_BOX_SCALE_FACTOR,
                                planes[selectedPlaneIndex].position.y - planes[selectedPlaneIndex].height / 1 * BOUNDING_BOX_SCALE_FACTOR,
@@ -117,7 +110,6 @@ int main(void){
                                planes[selectedPlaneIndex].position.z + planes[selectedPlaneIndex].depth / 1 * BOUNDING_BOX_SCALE_FACTOR }
                 }, RED);
 
-                //grass texture positioning
                 float grassPosX = camera.position.x - (grassTexture.width / 2);
                 float grassPosY = camera.position.y - 1100; 
                 DrawTextureRec(grassTexture, (Rectangle){ 0.0f, 0.0f, (float)grassTexture.width, (float)grassTexture.height }, (Vector2){ grassPosX, grassPosY }, WHITE);
@@ -127,9 +119,9 @@ int main(void){
         EndDrawing();
     }
 
-    //unload resources
     for (int i = 0; i < 3; i++) {
         UnloadModel(planes[i].model);
+        UnloadSound(planes[i].engineSound);
     }
     UnloadTexture(skyboxTexture);
     UnloadTexture(grassTexture);
@@ -137,3 +129,4 @@ int main(void){
 
     return 0;
 }
+
