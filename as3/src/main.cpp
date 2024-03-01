@@ -64,7 +64,7 @@ int main(void){
         else if (IsKeyDown(KEY_A))
             planes[selectedPlaneIndex].heading += VELOCITY_INCREMENT;
 
-        if (IsKeyDown(KEY_SPACE)) {
+        if (IsKeyDown(KEY_SPACE)){
             planes[selectedPlaneIndex].velocity = (Vector3){0.0f, 0.0f, 0.0f}; 
             planes[selectedPlaneIndex].isMoving = false; 
             StopSound(planes[selectedPlaneIndex].engineSound); 
