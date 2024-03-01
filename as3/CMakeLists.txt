@@ -34,3 +34,10 @@ set(TEXTURES_DEST_DIR ${CMAKE_BINARY_DIR}/textures)
 
 # Copy meshes to build directory during build
 file(COPY ${TEXTURES_SOURCE_DIR} DESTINATION ${TEXTURES_DEST_DIR})
+
+# Define source and destination paths for meshes
+set(SOUNDS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/sounds)
+set(SOUNDS_DEST_DIR ${CMAKE_BINARY_DIR}/sounds)
+
+# Copy meshes to build directory during build
+file(COPY ${SOUNDS_SOURCE_DIR} DESTINATION ${SOUNDS_DEST_DIR})

@@ -34,18 +34,18 @@ int main(void){
 
     //create and initialize planes
     Plane planes[3];
-    float planeSpacing = 100.0f; // Increased spacing between planes
-    float planeHeight = 5.0f; // Adjust the height of planes above the ground
+    float planeSpacing = 100.0f; 
+    float planeHeight = 5.0f; 
 
     for (int i = 0; i < 3; i++){
         planes[i].model = LoadModel("meshes/meshes/PolyPlane.glb");
-        planes[i].position = (Vector3){ -planeSpacing + i * planeSpacing, planeHeight, -200.0f }; // Adjusted initial positions with increased spacing and lower height
+        planes[i].position = (Vector3){ -planeSpacing + i * planeSpacing, planeHeight, -200.0f }; 
         planes[i].width = 10.0f;
         planes[i].height = 10.0f;
         planes[i].depth = 10.0f;
         planes[i].velocity = (Vector3){0.0f, 0.0f, 0.0f};
         planes[i].heading = 0.0f;
-        planes[i].engineSound = LoadSound("sounds/engine.wav");
+        planes[i].engineSound = LoadSound("sounds/sounds/engine.wav");
         planes[i].isMoving = false;
     }
 
@@ -65,19 +65,17 @@ int main(void){
             planes[selectedPlaneIndex].heading += VELOCITY_INCREMENT;
 
         if (IsKeyDown(KEY_SPACE)) {
-            planes[selectedPlaneIndex].velocity = (Vector3){0.0f, 0.0f, 0.0f}; // Stop the selected plane
-            planes[selectedPlaneIndex].isMoving = false; // Update moving flag
-            StopSound(planes[selectedPlaneIndex].engineSound); // Stop engine sound
+            planes[selectedPlaneIndex].velocity = (Vector3){0.0f, 0.0f, 0.0f}; 
+            planes[selectedPlaneIndex].isMoving = false; 
+            StopSound(planes[selectedPlaneIndex].engineSound); 
         }
 
-        // Update positions based on velocity
         for (int i = 0; i < 3; i++){
             planes[i].position.x += planes[i].velocity.x;
             planes[i].position.y += planes[i].velocity.y;
             planes[i].position.z += planes[i].velocity.z;
         }
 
-        // Update selected plane's position based on heading
         Vector3 forwardDirection = {sinf(planes[selectedPlaneIndex].heading), 0.0f, cosf(planes[selectedPlaneIndex].heading)};
         planes[selectedPlaneIndex].position.x += forwardDirection.x * planes[selectedPlaneIndex].velocity.x;
         planes[selectedPlaneIndex].position.z += forwardDirection.z * planes[selectedPlaneIndex].velocity.x;
