@@ -37,6 +37,7 @@ int main(){
 
     //load texture: alien image
     Texture2D alienTexture = LoadTexture("textures/textures/alien.png");
+    Texture2D spaceshipTexture = LoadTexture("textures/textures/spaceship.png"); // Change the path to your player texture file
 
     //initialize player
     Rectangle player = { screenWidth / 2 - 20, screenHeight - 50, 40, 20 };
@@ -65,10 +66,11 @@ int main(){
     }
 
     //initialize big red alien
-    Rectangle bigAlien = { screenWidth, 30, 60, 30 };
+    Rectangle bigAlien = { -bigAlien.width, 30, 60, 30 }; // Start from the left side (off-screen)
     bool bigAlienActive = false;
-    int bigAlienDirection = 1; //1 for right, -1 for left
-    int alienTimer = 10.0f; //timer for big red alien
+    int bigAlienDirection = 1; // Direction: 1 for right (moving across the screen)
+    int alienTimer = 3.0f; // Timer for big red alien
+
 
     //initialize barricades
     Rectangle barricades[MAX_BARRICADES] = {
@@ -195,23 +197,31 @@ int main(){
                         }
                     }
 
+                    // Increment timer based on frame time
+                    alienTimer += GetFrameTime() * 60; // Multiply by 60 to adjust to your target frame rate
                     //big red alien movement
-                    if (alienTimer >= 1800) { 
-                        alienTimer = 0; //reset timer
-                        if (!bigAlienActive) {
-                            bigAlienActive = true;
-                            bigAlien.x = screenWidth;
-                            bigAlienDirection = -1; 
-                        }
-                    }
+// Check if it's time to activate the big red alien
+if (alienTimer >= 600) { // 600 frames (10 seconds at 60 FPS)
+    alienTimer = 0; // Reset the timer
+    if (!bigAlienActive) {
+        bigAlienActive = true;
+        bigAlien.x = -bigAlien.width; // Start from the left side (off-screen)
+        bigAlien.y = GetRandomValue(30, screenHeight - 80 - bigAlien.height); // Randomize y position
+        bigAlienDirection = 1; // Direction: 1 for right (moving across the screen)
+    }
+}
 
-                    if (bigAlienActive) {
-                        // Slowly scroll the alien across the screen
-                        bigAlien.x += bigAlienDirection * 1;
-                        if (bigAlien.x < -bigAlien.width) {
-                            bigAlienActive = false;
-                        }
-                    }
+if (bigAlienActive) {
+    // Move the alien only horizontally
+    bigAlien.x += bigAlienDirection * 1;
+    if (bigAlien.x > screenWidth) {
+        bigAlienActive = false;
+    }
+}
+
+
+
+
 
                     //enemy shooting
                     if (enemyShotCooldown <= 0) {
@@ -302,7 +312,7 @@ int main(){
                                 barricades[i].y += BARRICADE_DAMAGE_AMOUNT; 
                             }
                         }
-                        
+
                         if (!bigAlienActive && GetRandomValue(0, 1000) < 2){ 
                             bigAlienActive = true;
                             bigAlienDirection = 1; 
@@ -319,7 +329,7 @@ int main(){
                 } else {
                     //blinking effect if hit
                     if (!playerHit || (playerHit && (playerBlinkFrames / 5) % 2 == 0)) {
-                        DrawRectangleRec(player, WHITE);
+                        DrawTextureEx(spaceshipTexture, (Vector2){ player.x, player.y }, 0, 0.08f, WHITE); // Scale down the texture by 0.5
                     }
 
                     //player shots
@@ -404,6 +414,7 @@ int main(){
 
     //unload texture
     UnloadTexture(alienTexture);
+    UnloadTexture(spaceshipTexture);
 
     return 0;
 }
