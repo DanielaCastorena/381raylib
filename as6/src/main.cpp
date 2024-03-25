@@ -155,7 +155,7 @@ int main(void) {
     float shipSpacing = 20.0f;
     float shipHeightOffset = -80.0f;
 
-    float maxSpeeds[5] = {0.25f, 100.18f, 0.3f, 0.22f, 0.35f};
+    float maxSpeeds[5] = {0.25f, 0.4f, 0.55f, 0.7f, 0.85f}; 
     float accelerations[5] = {0.02f, 0.015f, 0.025f, 0.018f, 0.03f};
     float turningRates[5] = {2.0f, 1.8f, 2.5f, 1.7f, 2.8f};
 
