@@ -1,130 +1,253 @@
-#include "raylib.h"
-#include "raymath.h"
+#include <raylib-cpp.hpp>
 
-#define VELOCITY_INCREMENT 0.01f
-#define BOUNDING_BOX_SCALE_FACTOR 2.0f
+#include <memory>
+#include <ranges>
+#include <iostream>
 
-typedef struct{
-    Model model;
-    Vector3 position;
-    Vector3 velocity;
-    float heading;
-    float width;
-    float height;
-    float depth;
-    Sound engineSound;
-    bool isMoving;
-} Plane;
+// #include "inputs.hpp"
+#include "skybox.hpp"
 
-int main(void){
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+template<typename T>
+concept Transformer = requires(T t, raylib::Transform m) {
+	{ t.operator()(m) } -> std::convertible_to<raylib::Transform>;
+};
 
-    InitWindow(screenWidth, screenHeight, "CS381 - Assignment 3");
+struct CalculateVelocityParams {
+	static constexpr float acceleration = 5;
+	static constexpr float angularAcceleration = 15;
 
-    Camera camera = {0};
-    camera.position = (Vector3){ 0.0f, 30.0f, -700.0f };
-    camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
-    camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
-    camera.fovy = 30.0f;
-    camera.projection = CAMERA_PERSPECTIVE;
+	float targetSpeed;
+	raylib::Degree targetHeading;
+	float& speed;
+	raylib::Degree& heading;
+	float dt;
 
-    Texture2D skyboxTexture = LoadTexture("textures/textures/skybox.png");
-    Texture2D grassTexture = LoadTexture("textures/textures/grass.jpg");
+	float maxSpeed = 50;
+	float minSpeed = 0;
+};
 
-    //create and initialize planes
-    Plane planes[3];
-    float planeSpacing = 100.0f; 
-    float planeHeight = 5.0f; 
+bool ProcessInput(raylib::Degree& planeTargetHeading, float& planeTargetSpeed, size_t& selectedPlane);
+raylib::Vector3 CaclulateVelocity(const CalculateVelocityParams& data);
+void DrawBoundedModel(raylib::Model& model, Transformer auto transformer);
+void DrawModel(raylib::Model& model, Transformer auto transformer);
 
-    for (int i = 0; i < 3; i++){
-        planes[i].model = LoadModel("meshes/meshes/PolyPlane.glb");
-        planes[i].position = (Vector3){ -planeSpacing + i * planeSpacing, planeHeight, -200.0f }; 
-        planes[i].width = 10.0f;
-        planes[i].height = 10.0f;
-        planes[i].depth = 10.0f;
-        planes[i].velocity = (Vector3){0.0f, 0.0f, 0.0f};
-        planes[i].heading = 0.0f;
-        planes[i].engineSound = LoadSound("sounds/sounds/engine.wav");
-        planes[i].isMoving = false;
-    }
 
-    int selectedPlaneIndex = 0; 
+int main() {
+	// Create window
+	const int screenWidth = 800 * 2;
+	const int screenHeight = 450 * 2;
+	raylib::Window window(screenWidth, screenHeight, "CS381 - Assignment 3");
+	// cs381::Inputs inputs(window);
 
-    SetTargetFPS(60);
+	// Create camera
+	auto camera = raylib::Camera(
+		raylib::Vector3(0, 120, -500), // Position
+		raylib::Vector3(0, 0, 300), // Target
+		raylib::Vector3::Up(), // Up direction
+		45.0f,
+		CAMERA_PERSPECTIVE
+	);
 
-    while (!WindowShouldClose()){
-        if (IsKeyDown(KEY_W))
-            planes[selectedPlaneIndex].velocity.x += VELOCITY_INCREMENT;
-        else if (IsKeyDown(KEY_S))
-            planes[selectedPlaneIndex].velocity.x -= VELOCITY_INCREMENT;
+	// Create skybox
+	cs381::SkyBox skybox("textures/skybox.png");
 
-        if (IsKeyDown(KEY_D))
-            planes[selectedPlaneIndex].heading -= VELOCITY_INCREMENT;
-        else if (IsKeyDown(KEY_A))
-            planes[selectedPlaneIndex].heading += VELOCITY_INCREMENT;
+	// Create ground
+	auto mesh = raylib::Mesh::Plane(10000, 10000, 50, 50, 25);
+	raylib::Model ground = ((raylib::Mesh*)&mesh)->LoadModelFrom();
+	raylib::Texture grass("textures/grass.jpg");
+	grass.SetFilter(TEXTURE_FILTER_BILINEAR);
+	grass.SetWrap(TEXTURE_WRAP_REPEAT);
+	ground.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = grass;
 
-        if (IsKeyDown(KEY_SPACE)){
-            planes[selectedPlaneIndex].velocity = (Vector3){0.0f, 0.0f, 0.0f}; 
-            planes[selectedPlaneIndex].isMoving = false; 
-            StopSound(planes[selectedPlaneIndex].engineSound); 
-        }
+	// Create airplane
+	raylib::Model plane("meshes/PolyPlane.glb");
+	// Set plane0 variables
+	raylib::Vector3 plane0Position = raylib::Vector3::Zero(), plane0Velocity = raylib::Vector3::Zero();
+	float plane0TargetSpeed = 0, plane0Speed = 0;
+	raylib::Degree plane0TargetHeading = 0, plane0Heading = 0;
+	// Set plane1 variables
+	raylib::Vector3 plane1Position = {50, 0, 0}, plane1Velocity = raylib::Vector3::Zero();
+	float plane1TargetSpeed = 0, plane1Speed = 0;
+	raylib::Degree plane1TargetHeading = 0, plane1Heading = 0;
+	// Set plane2 variables
+	raylib::Vector3 plane2Position = {-50, 0, 0}, plane2Velocity = raylib::Vector3::Zero();
+	float plane2TargetSpeed = 0, plane2Speed = 0;
+	raylib::Degree plane2TargetHeading = 0, plane2Heading = 0;
 
-        for (int i = 0; i < 3; i++){
-            planes[i].position.x += planes[i].velocity.x;
-            planes[i].position.y += planes[i].velocity.y;
-            planes[i].position.z += planes[i].velocity.z;
-        }
+	size_t selectedPlane = 0;
 
-        Vector3 forwardDirection = {sinf(planes[selectedPlaneIndex].heading), 0.0f, cosf(planes[selectedPlaneIndex].heading)};
-        planes[selectedPlaneIndex].position.x += forwardDirection.x * planes[selectedPlaneIndex].velocity.x;
-        planes[selectedPlaneIndex].position.z += forwardDirection.z * planes[selectedPlaneIndex].velocity.x;
 
-        if (IsKeyPressed(KEY_TAB)){
-            selectedPlaneIndex = (selectedPlaneIndex + 1) % 3; 
-        }
+	// Main loop
+	bool keepRunning = true;
+	while(!window.ShouldClose() && keepRunning) {
+		// Updates
+		// Process input for the selected plane
+		switch(selectedPlane) {
+			break; case 0: keepRunning = ProcessInput(plane0TargetHeading, plane0TargetSpeed, selectedPlane); 
+			break; case 1: keepRunning = ProcessInput(plane1TargetHeading, plane1TargetSpeed, selectedPlane); 
+			break; case 2: keepRunning = ProcessInput(plane2TargetHeading, plane2TargetSpeed, selectedPlane); 
+		}
+		
+		// Apply simple physics to plane0
+		plane0Velocity = CaclulateVelocity({
+			.targetSpeed = plane0TargetSpeed,
+			.targetHeading = plane0TargetHeading,
+			.speed = plane0Speed,
+			.heading = plane0Heading,
+			.dt = window.GetFrameTime()
+		});
+		plane0Position = plane0Position + plane0Velocity * window.GetFrameTime();
+		auto plane0Transformer = [plane0Position, plane0Heading](raylib::Transform transform) {
+			return transform.Translate(plane0Position).RotateY(raylib::Degree(plane0Heading));
+		};
 
-        BeginDrawing();
-        {
-            ClearBackground(RAYWHITE);
+		// Apply simple physics to plane1
+		plane1Velocity = CaclulateVelocity(CalculateVelocityParams{
+			.targetSpeed = plane1TargetSpeed,
+			.targetHeading = plane1TargetHeading,
+			.speed = plane1Speed,
+			.heading = plane1Heading,
+			.dt = window.GetFrameTime()
+		});
+		plane1Position = plane1Position + plane1Velocity * window.GetFrameTime();
+		auto plane1Transformer = [plane1Position, plane1Heading](raylib::Transform transform) {
+			return transform.Translate(plane1Position).RotateY(raylib::Degree(plane1Heading));
+		};
 
-            BeginMode3D(camera);
-            {
-                DrawTexturePro(skyboxTexture, 
-                               (Rectangle){0.0f, 0.0f, (float)skyboxTexture.width, -(float)skyboxTexture.height}, 
-                               (Rectangle){-(float)screenWidth / 2, -(float)screenHeight / 2, (float)screenWidth, (float)screenHeight}, 
-                               (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
+		// Apply simple physics to plane2
+		plane2Velocity = CaclulateVelocity(CalculateVelocityParams{
+			.targetSpeed = plane2TargetSpeed,
+			.targetHeading = plane2TargetHeading,
+			.speed = plane2Speed,
+			.heading = plane2Heading,
+			.dt = window.GetFrameTime()
+		});
+		plane2Position = plane2Position + plane2Velocity * window.GetFrameTime();
+		auto plane2Transformer = [plane2Position, plane2Heading](raylib::Transform transform) {
+			return transform.Translate(plane2Position).RotateY(raylib::Degree(plane2Heading));
+		};
 
-                for (int i = 0; i < 3; i++){
-                    DrawModel(planes[i].model, planes[i].position, 2.0f, WHITE);
-                }
 
-                DrawBoundingBox((BoundingBox){
-                    (Vector3){ planes[selectedPlaneIndex].position.x - planes[selectedPlaneIndex].width / 1 * BOUNDING_BOX_SCALE_FACTOR,
-                               planes[selectedPlaneIndex].position.y - planes[selectedPlaneIndex].height / 1 * BOUNDING_BOX_SCALE_FACTOR,
-                               planes[selectedPlaneIndex].position.z - planes[selectedPlaneIndex].depth / 1 * BOUNDING_BOX_SCALE_FACTOR },
-                    (Vector3){ planes[selectedPlaneIndex].position.x + planes[selectedPlaneIndex].width / 1 * BOUNDING_BOX_SCALE_FACTOR,
-                               planes[selectedPlaneIndex].position.y + planes[selectedPlaneIndex].height / 1 * BOUNDING_BOX_SCALE_FACTOR,
-                               planes[selectedPlaneIndex].position.z + planes[selectedPlaneIndex].depth / 1 * BOUNDING_BOX_SCALE_FACTOR }
-                }, RED);
+		// Rendering
+		window.BeginDrawing();
+		{
+			// Clear screen
+			window.ClearBackground(BLACK);
 
-                float grassPosX = camera.position.x - (grassTexture.width / 2);
-                float grassPosY = camera.position.y - 1100; 
-                DrawTextureRec(grassTexture, (Rectangle){ 0.0f, 0.0f, (float)grassTexture.width, (float)grassTexture.height }, (Vector2){ grassPosX, grassPosY }, WHITE);
-            }
-            EndMode3D();
-        }
-        EndDrawing();
-    }
+			camera.BeginMode();
+			{
+				// Render skybox and ground
+				skybox.Draw();
+				ground.Draw({});
 
-    for (int i = 0; i < 3; i++) {
-        UnloadModel(planes[i].model);
-        UnloadSound(planes[i].engineSound);
-    }
-    UnloadTexture(skyboxTexture);
-    UnloadTexture(grassTexture);
-    CloseWindow();
+				// Draw the planes with a bounding box around the selected plane
+				switch(selectedPlane) {
+					break; case 0: {
+						DrawBoundedModel(plane, plane0Transformer);
+						DrawModel(plane, plane1Transformer);
+						DrawModel(plane, plane2Transformer);
+					} break; case 1: {
+						DrawModel(plane, plane0Transformer);
+						DrawBoundedModel(plane, plane1Transformer);
+						DrawModel(plane, plane2Transformer);
+					} break; case 2: {
+						DrawModel(plane, plane0Transformer);
+						DrawModel(plane, plane1Transformer);
+						DrawBoundedModel(plane, plane2Transformer);
+					}
+				}
+			}
+			camera.EndMode();
 
-    return 0;
+			// Measure our FPS
+			DrawFPS(10, 10);
+		}
+		window.EndDrawing();
+	}
+
+	return 0;
+}
+
+// Input handling
+bool ProcessInput(raylib::Degree& planeTargetHeading, float& planeTargetSpeed, size_t& selectedPlane) {
+	static bool wPressedLastFrame = false, sPressedLastFrame = false;
+	static bool aPressedLastFrame = false, dPressedLastFrame = false;
+	static bool tabPressedLastFrame = false;
+
+	// If we hit escape... shutdown
+	if(IsKeyDown(KEY_ESCAPE))
+		return false;
+
+	// WASD updates plane velocity
+	if(IsKeyDown(KEY_W) && !wPressedLastFrame)
+		planeTargetSpeed += 1;
+	if(IsKeyDown(KEY_S) && !sPressedLastFrame)
+		planeTargetSpeed -= 1;
+	if(IsKeyDown(KEY_A) && !aPressedLastFrame)
+		planeTargetHeading += 5;
+	if(IsKeyDown(KEY_D) && !dPressedLastFrame)
+		planeTargetHeading -= 5;  
+
+	// Space sets velocity to 0!
+	if(IsKeyDown(KEY_SPACE))
+		planeTargetSpeed = 0;
+
+	// Tab selects the next plane
+	if(IsKeyDown(KEY_TAB) && !tabPressedLastFrame)
+		selectedPlane = (selectedPlane + 1) % 3;
+
+	// Save the state of the key for next frame
+	wPressedLastFrame = IsKeyDown(KEY_W);
+	sPressedLastFrame = IsKeyDown(KEY_S);
+	aPressedLastFrame = IsKeyDown(KEY_A);
+	dPressedLastFrame = IsKeyDown(KEY_D);
+
+	tabPressedLastFrame = IsKeyDown(KEY_TAB);
+
+	return true;
+}
+
+raylib::Vector3 CaclulateVelocity(const CalculateVelocityParams& data) {
+	static constexpr auto AngleClamp = [](raylib::Degree angle) -> raylib::Degree {
+		float decimal = float(angle) - int(angle);
+		int whole = int(angle) % 360;
+		whole += (whole < 0) * 360;
+		return decimal + whole;
+	};
+
+	float target = Clamp(data.targetSpeed, data.minSpeed, data.maxSpeed);
+	if(data.speed < target) data.speed += data.acceleration * data.dt;
+	else if(data.speed > target) data.speed -= data.acceleration * data.dt;
+	data.speed = Clamp(data.speed, data.minSpeed, data.maxSpeed);
+
+	target = AngleClamp(data.targetHeading);
+	float difference = abs(target - data.heading);
+	if(target > data.heading) {
+		if(difference < 180) data.heading += data.angularAcceleration * data.dt;
+		else if(difference > 180) data.heading -= data.angularAcceleration * data.dt;
+	} else if(target < data.heading) {
+		if(difference < 180) data.heading -= data.angularAcceleration * data.dt;
+		else if(difference > 180) data.heading += data.angularAcceleration * data.dt;
+	} 
+	if(difference < .5) data.heading = target; // If the heading is really close to correct 
+	data.heading = AngleClamp(data.heading);
+	raylib::Radian angle = raylib::Degree(data.heading);
+
+	return {cos(angle) * data.speed, 0, -sin(angle) * data.speed};
+}
+
+void DrawBoundedModel(raylib::Model& model, Transformer auto transformer) {
+	raylib::Transform backupTransform = model.transform;
+	model.transform = transformer(backupTransform);
+	model.Draw({});
+	model.GetTransformedBoundingBox().Draw();
+	model.transform = backupTransform;
+}
+
+void DrawModel(raylib::Model& model, Transformer auto transformer) {
+	raylib::Transform backupTransform = model.transform;
+	model.transform = transformer(backupTransform);
+	model.Draw({});
+	model.transform = backupTransform;
 }
 
