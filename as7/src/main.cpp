@@ -12,7 +12,6 @@ const float zoomFactor = 1.2f;
 
 enum class Direction { None, Up, Down, Left, Right };
 
-//classes
 class Entity {
 public:
     Vector2 position;
@@ -205,10 +204,15 @@ void DrawGame(Snake& snake, Apple& apple, Texture2D& snakeHeadTexture, Texture2D
 
 int main() {
     InitWindow(screenWidth, screenHeight, "Snake");
+    InitAudioDevice();
+    
     //custom textures
     Texture2D snakeHeadTexture = LoadTexture("textures/textures/snakehead.png");
     Texture2D snakeBodyTexture = LoadTexture("textures/textures/snakebody.png");
     Texture2D appleTexture = LoadTexture("textures/textures/apple.gif");
+
+    Music backgroundMusic = LoadMusicStream("path/to/your/background_music.mp3");
+    PlayMusicStream(backgroundMusic);
 
     Snake snake;
     Apple apple = Apple(SpawnApple(snake.segments).x, SpawnApple(snake.segments).y);
@@ -282,6 +286,11 @@ int main() {
     UnloadTexture(snakeHeadTexture);
     UnloadTexture(snakeBodyTexture);
     UnloadTexture(appleTexture);
+
+    StopMusicStream(backgroundMusic);
+    UnloadMusicStream(backgroundMusic);
+
+    CloseAudioDevice();
 
     CloseWindow();
 
