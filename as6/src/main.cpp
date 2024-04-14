@@ -36,15 +36,38 @@ typedef struct {
     float depth;
 } Bird;
 
-// Physics component for oriented physics
+// Oriented physics component for updating position and velocity based on heading
 void UpdatePhysicsComponent(Vector3 *position, Vector3 *velocity, float heading, float deltaTime) {
-    position->x += velocity->x * deltaTime;
-    position->z += velocity->z * deltaTime;
+    // Calculate the velocity vector based on the heading angle
+    Vector3 forwardVector = { cosf(DEG2RAD * heading), 0.0f, sinf(DEG2RAD * heading) };
+    Vector3 scaledVelocity = Vector3Scale(forwardVector, Vector3Length(*velocity));
 
-    // Oriented physics
-    velocity->x = cosf(DEG2RAD * heading) * Vector3Length(*velocity);
-    velocity->z = sinf(DEG2RAD * heading) * Vector3Length(*velocity);
+    // Update position
+    position->x += scaledVelocity.x * deltaTime;
+    position->z += scaledVelocity.z * deltaTime;
 }
+
+// Input component functions for ships using oriented physics
+void increaseVelocityShip(Ship *ship) {
+    ship->velocity.x += ship->acceleration * sinf(DEG2RAD * ship->heading);
+    ship->velocity.z -= ship->acceleration * cosf(DEG2RAD * ship->heading);
+}
+
+void decreaseVelocityShip(Ship *ship) {
+    ship->velocity.x -= ship->acceleration * sinf(DEG2RAD * ship->heading);
+    ship->velocity.z += ship->acceleration * cosf(DEG2RAD * ship->heading);
+}
+
+void increaseHeadingShip(Ship *ship) {
+    ship->heading += ship->turningRate;
+    if (ship->heading > 360) ship->heading -= 360;
+}
+
+void decreaseHeadingShip(Ship *ship) {
+    ship->heading -= ship->turningRate;
+    if (ship->heading < 0) ship->heading += 360;
+}
+
 
 //ships
 void increaseVelocityShip(Ship *ship);

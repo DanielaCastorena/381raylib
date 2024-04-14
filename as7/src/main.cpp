@@ -1,342 +1,287 @@
 #include "raylib.h"
-#include <stdlib.h> // rand() & srand()
-#include <time.h>   // time()
+#include <vector>
+#include <ctime>
+#include <string>
+#include <queue>
 
-#define MAX_ENEMIES 55
-#define MAX_SHOTS 50
-#define ENEMY_SHOT_COOLDOWN_MIN 30
-#define ENEMY_SHOT_COOLDOWN_MAX 120
-#define PLAYER_SHOT_COOLDOWN 20 
-#define MAX_BARRICADES 4
-#define BARRICADE_HEALTH 3
-#define BARRICADE_DAMAGE_AMOUNT 2 // pixels removed when a barricade gets hit
+const int screenWidth = 800;
+const int screenHeight = 600;
+const int gridSize = 20;
+const int appleSize = 22;
+const float zoomFactor = 1.2f;
 
-typedef struct {
+enum class Direction { None, Up, Down, Left, Right };
+
+//classes
+class Entity {
+public:
     Vector2 position;
-    bool active;
-    int directionX; // 1 for right, -1 for left
-    int directionY; // 1 for down, -1 for up
-} Enemy;
 
-void DrawBlinkingRectangle(Rectangle rect, Color color, bool isVisible); // to let player know when they've been hit
+    Entity(int x, int y) : position({ static_cast<float>(x), static_cast<float>(y) }) {}
+};
 
-int main() {
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+class Apple : public Entity {
+public:
+    Apple(int x, int y) : Entity(x, y) {}
+};
 
-    InitWindow(screenWidth, screenHeight, "Space Invaders Remake");
+class SnakeSegment : public Entity {
+public:
+    SnakeSegment(int x, int y) : Entity(x, y) {}
+};
 
-    enum GameState {
-        MENU,
-        GAMEPLAY,
-        GAME_OVER
-    } gameState = MENU;
+class Snake {
+public:
+    std::vector<SnakeSegment> segments;
+    Direction direction;
+    bool ateApple;
 
-    // Load textures
-    Texture2D alienTexture1 = LoadTexture("textures/textures/alien1.png");
-    Texture2D alienTexture2 = LoadTexture("textures/textures/alien2.png");
-    Texture2D alienTexture3 = LoadTexture("textures/textures/alien3.png");
-    Texture2D spaceshipTexture = LoadTexture("textures/textures/spaceship.png");
-
-    // Initialize player
-    Rectangle player = {screenWidth / 2 - 20, screenHeight - 50, 40, 20};
-    int playerLives = 3;
-    bool playerHit = false;
-    int playerBlinkFrames = 0;
-    const int blinkTime = 30;
-    const int respawnTime = 60;
-    int respawnFrames = 0;
-
-    // Initialize shots
-    Rectangle shots[MAX_SHOTS] = {0};
-    int shotCooldown = 0;
-
-    // Initialize enemy shots
-    Rectangle enemyShots[MAX_SHOTS] = {0};
-    int enemyShotCooldown = GetRandomValue(ENEMY_SHOT_COOLDOWN_MIN, ENEMY_SHOT_COOLDOWN_MAX);
-
-    // Initialize enemies
-    Enemy enemies[MAX_ENEMIES] = {0};
-    for (int i = 0; i < MAX_ENEMIES; i++) {
-        enemies[i].position = (Vector2){50.0f + (i % 11) * 60.0f, 50.0f + (i / 11) * 40.0f};
-        enemies[i].active = true;
-        enemies[i].directionX = 1; // move right
-        enemies[i].directionY = 1; // move down
+    Snake() : direction(Direction::Right), ateApple(false) {
+        segments.push_back({ screenWidth / 2 - screenWidth / 2 % gridSize, screenHeight / 2 - screenHeight / 2 % gridSize });
     }
 
-    // Initialize barricades
-    Rectangle barricades[MAX_BARRICADES] = {
-        {screenWidth / 5, screenHeight - 100, 50, 50},
-        {2 * screenWidth / 5, screenHeight - 100, 50, 50},
-        {3 * screenWidth / 5, screenHeight - 100, 50, 50},
-        {4 * screenWidth / 5, screenHeight - 100, 50, 50}};
-    int barricadeHealth[MAX_BARRICADES] = {BARRICADE_HEALTH, BARRICADE_HEALTH, BARRICADE_HEALTH, BARRICADE_HEALTH};
-
-    // Initialize score
-    int score = 0;
-
-    bool gameover = false;
-    bool restart = false;
-
-    // Random number generator
-    srand(time(NULL));
-
-    SetTargetFPS(60);
-
-    while (!WindowShouldClose()) {
-        switch (gameState) {
-            case MENU: {
-                BeginDrawing();
-                ClearBackground(BLACK);
-
-                // Start screen
-                DrawText("SPACE INVADERS REMAKE", screenWidth / 2 - MeasureText("SPACE INVADERS REMAKE", 40) / 2, screenHeight / 2 - 50, 40, PURPLE);
-                DrawText("PRESS ENTER TO START", screenWidth / 2 - MeasureText("PRESS ENTER TO START", 20) / 2, screenHeight / 2 + 20, 20, WHITE);
-
-                EndDrawing();
-
-                if (IsKeyPressed(KEY_ENTER)) {
-                    gameState = GAMEPLAY;
-                }
-
+    void Move() {
+        Vector2 newPos = segments[0].position;
+        switch (direction) {
+            case Direction::Up:
+                newPos.y -= gridSize;
                 break;
-            }
-
-            case GAMEPLAY: {
-                if (IsKeyPressed(KEY_ENTER) && gameover) { // for game over (loss)
-                    // Reset game variables
-                    playerLives = 3;
-                    score = 0;
-                    gameover = false;
-                    restart = false;
-
-                    // Reset player position
-                    player.x = screenWidth / 2 - 20;
-                    player.y = screenHeight - 50;
-
-                    // Reactivate enemies and reset their positions
-                    for (int i = 0; i < MAX_ENEMIES; i++) {
-                        enemies[i].position = (Vector2){50.0f + (i % 11) * 60.0f, 50.0f + (i / 11) * 40.0f};
-                        enemies[i].active = true;
-                        enemies[i].directionX = 1;
-                        enemies[i].directionY = 1;
-                    }
-
-                    // Reset barricade
-                    for (int i = 0; i < MAX_BARRICADES; i++) {
-                        barricadeHealth[i] = BARRICADE_HEALTH;
-                    }
-                }
-
-                // Increment timer
-                if (!gameover && playerLives > 0) {
-                    // Player respawn countdown
-                    if (respawnFrames > 0) {
-                        respawnFrames--;
-                        if (respawnFrames == 0) {
-                            playerHit = false;
-                            player.x = screenWidth / 2 - 20;
-                            player.y = screenHeight - 50;
-                        }
-                    }
-
-                    // Player movement
-                    if (!playerHit) {
-                        if (IsKeyDown(KEY_LEFT) && player.x > 0) player.x -= 5;
-                        if (IsKeyDown(KEY_RIGHT) && player.x + player.width < screenWidth) player.x += 5;
-                    }
-
-// Player shooting
-if (!playerHit && IsKeyDown(KEY_SPACE) && shotCooldown <= 0) {
-    for (int i = 0; i < MAX_SHOTS; i++) {
-        if (shots[i].height == 0) {
-            shots[i] = (Rectangle){player.x + player.width / 2 - 1, player.y, 2, 10}; // Set the shot's height to 10
-            shotCooldown = PLAYER_SHOT_COOLDOWN; // Reset cooldown
-            break;
-        }
-    }
-}
-
-
-// Decrement player shot cooldown
-if (shotCooldown > 0) {
-    shotCooldown--;
-}
-
-
-                    // Enemy movement and check collision with window edge
-                    bool moveDown = false;
-                    for (int i = 0; i < MAX_ENEMIES; i++) {
-                        if (enemies[i].active) {
-                            enemies[i].position.x += enemies[i].directionX * 1; // Move horizontally
-                            if (enemies[i].position.x <= 0 || enemies[i].position.x >= screenWidth - 40) {
-                                moveDown = true;
-                            }
-                        }
-                    }
-
-                    if (moveDown) {
-                        for (int i = 0; i < MAX_ENEMIES; i++) {
-                            if (enemies[i].active) {
-                                enemies[i].position.y += 10 * enemies[i].directionY; // Move down slightly
-                                enemies[i].directionX *= -1; // Change direction horizontally
-                                if (enemies[i].position.y >= screenHeight - 80) {
-                                    gameover = true;
-                                    restart = true;
-                                }
-                            }
-                        }
-                    }
-
-                    // Enemy shooting
-                    if (enemyShotCooldown <= 0) {
-                        for (int i = 0; i < MAX_ENEMIES; i++) {
-                            if (enemies[i].active) {
-                                if (GetRandomValue(0, 100) < 3) {
-                                    // Look for an available shot slot
-                                    for (int j = 0; j < MAX_SHOTS; j++) {
-                                        if (enemyShots[j].height == 0) {
-                                            // Create a shot and exit the loop
-                                            enemyShots[j] = (Rectangle){enemies[i].position.x + 20 - 1, enemies[i].position.y + 20, 2, 10};
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        enemyShotCooldown = GetRandomValue(ENEMY_SHOT_COOLDOWN_MIN, ENEMY_SHOT_COOLDOWN_MAX);
-                    }
-
-                    // Check collisions between player shots & enemies
-                    for (int i = 0; i < MAX_SHOTS; i++) {
-                        if (shots[i].height > 0) {
-                            for (int j = 0; j < MAX_ENEMIES; j++) {
-                                if (enemies[j].active && CheckCollisionRecs(shots[i], (Rectangle){enemies[j].position.x, enemies[j].position.y, 40, 20})) {
-                                    shots[i].height = 0;
-                                    enemies[j].active = false;
-                                    score += 10; // Increment score when an enemy is destroyed
-                                }
-                            }
-                        }
-                    }
-
-                    // Check collisions between player and enemy shots
-                    for (int i = 0; i < MAX_SHOTS; i++) {
-                        if (enemyShots[i].height > 0 && CheckCollisionRecs(enemyShots[i], player)) {
-                            enemyShots[i].height = 0; // Reset the enemy shot
-                            playerHit = true; // Set player hit flag
-                            playerLives--; // Decrement player lives
-                            respawnFrames = respawnTime; // Start respawn countdown
-                            break; // Exit the loop after one collision
-                        }
-                    }
-
-                    // Check collisions between player shots and barricades (Not included for now)
-
-                    // Display barricades
-                    for (int i = 0; i < MAX_BARRICADES; i++) {
-                        DrawRectangleRec(barricades[i], GRAY);
-                    }
-
-                    // Display score
-                    DrawText(TextFormat("SCORE: %04i", score), 10, 10, 20, WHITE);
-
-                    // Display lives
-                    DrawText(TextFormat("LIVES: %i", playerLives), screenWidth - 100, 10, 20, WHITE);
-                } else {
-                    // Game over: loss
-                    gameover = true;
-                    restart = true;
-                }
-
-                BeginDrawing();
-                ClearBackground(BLACK);
-
-                if (gameover) {
-                    DrawText("GAME OVER", screenWidth / 2 - MeasureText("GAME OVER", 40) / 2, screenHeight / 2 - 20, 40, RED);
-                    DrawText("PRESS ENTER TO RESTART", screenWidth / 2 - MeasureText("PRESS ENTER TO RESTART", 20) / 2, screenHeight / 2 + 20, 20, WHITE);
-                } else {
-                    // Blinking effect if hit
-                    if (!playerHit || (playerHit && (playerBlinkFrames / 5) % 2 == 0)) {
-                        DrawTextureEx(spaceshipTexture, (Vector2){player.x, player.y}, 0, 0.08f, WHITE);
-                    }
-            // Player shots
-for (int i = 0; i < MAX_SHOTS; i++) {
-    if (shots[i].height > 0) {
-        DrawRectangleRec(shots[i], WHITE); // Draw the shot
-    }
-}
-
-
-// Update player shots
-for (int i = 0; i < MAX_SHOTS; i++) {
-    if (shots[i].height > 0) {
-        shots[i].y -= 5; // Move the shot upwards
-
-        // Check if the shot is out of bounds
-        if (shots[i].y + shots[i].height < 0) {
-            shots[i].height = 0; // Reset the shot if it's out of bounds
-        }
-    }
-}
-
-
-// Update enemy shots
-for (int i = 0; i < MAX_SHOTS; i++) {
-    if (enemyShots[i].height > 0) {
-        enemyShots[i].y += 5; // Move the enemy shot downwards
-
-        // Check if the shot is out of bounds
-        if (enemyShots[i].y > screenHeight) {
-            enemyShots[i].height = 0; // Reset the enemy shot if it's out of bounds
-        }
-    }
-}
-
-
-                    // Enemies
-                    for (int i = 0; i < MAX_ENEMIES; i++) {
-                        if (enemies[i].active) {
-                            // Draw the alien texture with adjusted size
-                            if (i >= 0 && i < 22) {
-                                DrawTexturePro(alienTexture1, (Rectangle){0, 0, static_cast<float>(alienTexture1.width), static_cast<float>(alienTexture1.height)},
-                                               (Rectangle){enemies[i].position.x, enemies[i].position.y, 40, 20}, (Vector2){0, 0}, 0.0f, WHITE);
-                            } else if (i >= 22 && i < 44) {
-                                DrawTexturePro(alienTexture2, (Rectangle){0, 0, static_cast<float>(alienTexture2.width), static_cast<float>(alienTexture2.height)},
-                                               (Rectangle){enemies[i].position.x, enemies[i].position.y, 40, 20}, (Vector2){0, 0}, 0.0f, WHITE);
-                            } else {
-                                DrawTexturePro(alienTexture3, (Rectangle){0, 0, static_cast<float>(alienTexture3.width), static_cast<float>(alienTexture3.height)},
-                                               (Rectangle){enemies[i].position.x, enemies[i].position.y, 40, 20}, (Vector2){0, 0}, 0.0f, WHITE);
-                            }
-                        }
-                    }
-                }
-
-                EndDrawing();
-
+            case Direction::Down:
+                newPos.y += gridSize;
                 break;
-            }
+            case Direction::Left:
+                newPos.x -= gridSize;
+                break;
+            case Direction::Right:
+                newPos.x += gridSize;
+                break;
+            default:
+                break;
+        }
+        segments.insert(segments.begin(), { static_cast<int>(newPos.x), static_cast<int>(newPos.y) });
 
+        if (!ateApple) {
+            segments.pop_back();
+        } else {
+            ateApple = false;
+        }
+    }
+
+    bool CheckCollision(const Vector2& applePos) const {
+        Rectangle snakeHeadRect = { segments[0].position.x, segments[0].position.y, static_cast<float>(gridSize / 2), static_cast<float>(gridSize) };
+        Rectangle appleRect = { applePos.x, applePos.y, static_cast<float>(appleSize), static_cast<float>(appleSize) };
+        return CheckCollisionRecs(snakeHeadRect, appleRect);
+    }
+
+    bool CheckCollision() const {
+        Vector2 headPos = segments[0].position;
+        for (size_t i = 1; i < segments.size(); ++i) {
+            if (headPos.x == segments[i].position.x && headPos.y == segments[i].position.y) {
+                return true;
+            }
+        }
+        if (headPos.x < 0 || headPos.x >= screenWidth || headPos.y < 0 || headPos.y >= screenHeight) {
+            return true;
+        }
+        return false;
+    }
+
+    void ChangeDirection(Direction newDir) {
+        if ((newDir == Direction::Up && direction != Direction::Down) ||
+            (newDir == Direction::Down && direction != Direction::Up) ||
+            (newDir == Direction::Left && direction != Direction::Right) ||
+            (newDir == Direction::Right && direction != Direction::Left)) {
+            direction = newDir;
+        }
+    }
+
+    int GetScore() const {
+        return segments.size() - 1;
+    }
+
+    void Draw(Texture2D& headTexture, Texture2D& bodyTexture, float zoomFactor) {
+        float rotation = 0.0f;
+        switch (direction) {
+            case Direction::Up:
+                rotation = 270.0f;
+                break;
+            case Direction::Down:
+                rotation = 90.0f;
+                break;
+            case Direction::Left:
+                rotation = 180.0f;
+                break;
+            case Direction::Right:
+                rotation = 0.0f;
+                break;
             default:
                 break;
         }
 
-        // Update timers
-        if (shotCooldown > 0) shotCooldown--;
-        if (enemyShotCooldown > 0) enemyShotCooldown--;
-        if (playerHit) {
-            playerBlinkFrames++;
-            if (playerBlinkFrames >= blinkTime * 2) {
-                playerBlinkFrames = 0;
+        DrawTexturePro(headTexture, Rectangle{ 0, 0, static_cast<float>(headTexture.width), static_cast<float>(headTexture.height) }, 
+            Rectangle{ segments[0].position.x, segments[0].position.y, static_cast<float>(gridSize * zoomFactor), static_cast<float>(gridSize * zoomFactor) },
+            Vector2{ static_cast<float>(gridSize * zoomFactor / 2), static_cast<float>(gridSize * zoomFactor / 2) }, rotation, WHITE);
+
+        for (size_t i = 1; i < segments.size(); ++i) {
+            float posX = segments[i].position.x;
+            float posY = segments[i].position.y;
+            float bodyRotation = 0.0f;
+            if (i < segments.size() - 1) {
+                Vector2 delta = { segments[i + 1].position.x - segments[i].position.x, segments[i + 1].position.y - segments[i].position.y };
+                if (delta.x < 0) bodyRotation = 180.0f;
+                else if (delta.x > 0) bodyRotation = 0.0f;
+                else if (delta.y < 0) bodyRotation = 270.0f;
+                else if (delta.y > 0) bodyRotation = 90.0f;
+            } else {
+                Vector2 delta = { segments[i].position.x - segments[i - 1].position.x, segments[i].position.y - segments[i - 1].position.y };
+                if (delta.x < 0) bodyRotation = 180.0f;
+                else if (delta.x > 0) bodyRotation = 0.0f;
+                else if (delta.y < 0) bodyRotation = 270.0f;
+                else if (delta.y > 0) bodyRotation = 90.0f;
             }
+
+            DrawTexturePro(bodyTexture, Rectangle{ 0, 0, static_cast<float>(bodyTexture.width), static_cast<float>(bodyTexture.height) }, 
+                Rectangle{ posX, posY, static_cast<float>(gridSize * zoomFactor), static_cast<float>(gridSize * zoomFactor) },
+                Vector2{ static_cast<float>(gridSize * zoomFactor / 2), static_cast<float>(gridSize * zoomFactor / 2) }, bodyRotation, WHITE);
         }
     }
+};
 
-    // Unload textures
-    UnloadTexture(alienTexture1);
-    UnloadTexture(alienTexture2);
-    UnloadTexture(alienTexture3);
-    UnloadTexture(spaceshipTexture);
+Vector2 SpawnApple(const std::vector<SnakeSegment>& segments) {
+    Vector2 applePos;
+    bool validPos = false;
+    while (!validPos) {
+        int gridX = GetRandomValue(1, (screenWidth - gridSize) / gridSize);
+        int gridY = GetRandomValue(1, (screenHeight - gridSize) / gridSize);
+        float offsetX = static_cast<float>(GetRandomValue(gridSize / 4, gridSize * 3 / 4));
+        float offsetY = static_cast<float>(GetRandomValue(gridSize / 4, gridSize * 3 / 4));
+        
+        applePos.x = gridX * gridSize + offsetX - appleSize / 2;
+        applePos.y = gridY * gridSize + offsetY - appleSize / 2;
+
+        bool collision = false;
+        for (const auto& segment : segments) {
+            if (CheckCollisionCircles(applePos, appleSize / 2, segment.position, gridSize / 2)) {
+                collision = true;
+                break;
+            }
+        }
+
+        if (!collision) {
+            validPos = true;
+        }
+    }
+    return applePos;
+}
+
+void DrawGameOverScreen(int score) {
+    DrawText("Game Over!", screenWidth / 2 - MeasureText("Game Over!", 40) / 2, screenHeight / 2 - 20, 40, RED);
+    int scoreTextWidth = MeasureText("Score: ", 20);
+    DrawText(("Score: " + std::to_string(score)).c_str(), screenWidth / 2 - scoreTextWidth / 2, screenHeight / 2 + 40, 20, BLACK);
+    int restartTextWidth = MeasureText("Press Enter to Restart", 20);
+    DrawText("Press Enter to Restart", screenWidth / 2 - restartTextWidth / 2, screenHeight / 2 + 80, 20, BLACK);
+}
+
+void DrawStartScreen() {
+    DrawText("Snake", screenWidth / 2 - MeasureText("Snake", 60) / 2, screenHeight / 2 - 50, 60, BLACK);
+    DrawText("Press Enter to Start", screenWidth / 2 - MeasureText("Press Enter to Start", 20) / 2, screenHeight / 2 + 50, 20, BLACK);
+}
+
+void DrawGame(Snake& snake, Apple& apple, Texture2D& snakeHeadTexture, Texture2D& snakeBodyTexture, Texture2D& appleTexture) {
+    for (int x = 0; x <= screenWidth; x += gridSize * zoomFactor) {
+        DrawLine(x, 0, x, screenHeight, LIGHTGRAY);
+    }
+    for (int y = 0; y <= screenHeight; y += gridSize * zoomFactor) {
+        DrawLine(0, y, screenWidth, y, LIGHTGRAY);
+    }
+
+    DrawText(("Score: " + std::to_string(snake.GetScore())).c_str(), 20 * zoomFactor, 20 * zoomFactor, 20 * zoomFactor, BLACK);
+
+    const float scaleFactor = static_cast<float>(gridSize * zoomFactor) / static_cast<float>(appleTexture.width);
+    DrawTextureEx(appleTexture, { apple.position.x, apple.position.y }, 0.0f, scaleFactor, WHITE);
+
+    snake.Draw(snakeHeadTexture, snakeBodyTexture, zoomFactor);
+}
+
+int main() {
+    InitWindow(screenWidth, screenHeight, "Snake");
+    //custom textures
+    Texture2D snakeHeadTexture = LoadTexture("textures/textures/snakehead.png");
+    Texture2D snakeBodyTexture = LoadTexture("textures/textures/snakebody.png");
+    Texture2D appleTexture = LoadTexture("textures/textures/apple.gif");
+
+    Snake snake;
+    Apple apple = Apple(SpawnApple(snake.segments).x, SpawnApple(snake.segments).y);
+
+    SetTargetFPS(10);
+
+    bool gameOver = false;
+    bool gameStarted = false;
+
+    while (!WindowShouldClose()) {
+        if (!gameOver) {
+            if (!gameStarted) {
+                BeginDrawing();
+                ClearBackground(RAYWHITE);
+
+                DrawStartScreen();
+
+                EndDrawing();
+
+                if (IsKeyPressed(KEY_ENTER)) {
+                    gameStarted = true;
+                }
+
+                continue;
+            }
+
+            Direction nextDir = Direction::None;
+
+            if (IsKeyPressed(KEY_UP)) nextDir = Direction::Up;
+            else if (IsKeyPressed(KEY_DOWN)) nextDir = Direction::Down;
+            else if (IsKeyPressed(KEY_LEFT)) nextDir = Direction::Left;
+            else if (IsKeyPressed(KEY_RIGHT)) nextDir = Direction::Right;
+
+            if (nextDir != Direction::None) {
+                snake.ChangeDirection(nextDir);
+            }
+
+            snake.Move();
+
+            if (snake.CheckCollision()) {
+                gameOver = true;
+            }
+
+            if (snake.CheckCollision(apple.position)) {
+                apple = Apple(SpawnApple(snake.segments).x, SpawnApple(snake.segments).y);
+                snake.ateApple = true;
+            }
+        } else {
+            DrawGameOverScreen(snake.GetScore());
+
+            if (IsKeyPressed(KEY_ENTER)) {
+                snake = Snake();
+                apple = Apple(SpawnApple(snake.segments).x, SpawnApple(snake.segments).y);
+                gameOver = false;
+                gameStarted = true;
+            }
+        }
+
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
+
+        if (!gameOver) {
+            DrawGame(snake, apple, snakeHeadTexture, snakeBodyTexture, appleTexture);
+        } else {
+            DrawGameOverScreen(snake.GetScore());
+        }
+
+        EndDrawing();
+    }
+
+    UnloadTexture(snakeHeadTexture);
+    UnloadTexture(snakeBodyTexture);
+    UnloadTexture(appleTexture);
 
     CloseWindow();
 
