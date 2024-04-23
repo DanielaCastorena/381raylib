@@ -22,3 +22,6 @@
 [submodule "as7/raylib-cpp"]
 	path = as7/raylib-cpp
 	url = https://github.com/joshuadahlunr/raylib-cpp.git
+[submodule "as8/raylib-cpp"]
+	path = as8/raylib-cpp
+	url = https://github.com/joshuadahlunr/raylib-cpp.git

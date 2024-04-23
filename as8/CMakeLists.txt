@@ -1,0 +1,25 @@
+cmake_minimum_required(VERSION 3.20)
+project(DuckLib LANGUAGES CXX)
+
+include(includeable.cmake)
+add_subdirectory(raylib-cpp)
+
+file(GLOB sources "src/*.cpp" "src/*.c")
+add_executable(as8 ${sources})
+target_link_libraries(as8 PUBLIC raylib raylib_cpp)
+set_property(TARGET as8 PROPERTY CXX_STANDARD 20)
+
+configure_file(textures/skybox.png textures/skybox.png COPYONLY)
+configure_file(textures/grass.jpg textures/grass.jpg COPYONLY)
+configure_file(textures/water.jpg textures/water.jpg COPYONLY)
+configure_file(meshes/PolyPlane.glb meshes/PolyPlane.glb COPYONLY)
+configure_file(meshes/ship1.glb meshes/ship1.glb COPYONLY)
+configure_file(meshes/ship2.glb meshes/ship2.glb COPYONLY)
+configure_file(meshes/ship3.glb meshes/ship3.glb COPYONLY)
+configure_file(meshes/ship4.glb meshes/ship4.glb COPYONLY)
+configure_file(meshes/ship5.glb meshes/ship5.glb COPYONLY)
+
+make_includeable(raylib-cpp/raylib/examples/models/resources/shaders/glsl330/skybox.vs generated/skybox.330.vs)
+make_includeable(raylib-cpp/raylib/examples/models/resources/shaders/glsl330/skybox.fs generated/skybox.330.fs)
+make_includeable(raylib-cpp/raylib/examples/models/resources/shaders/glsl330/cubemap.vs generated/cubemap.330.vs)
+make_includeable(raylib-cpp/raylib/examples/models/resources/shaders/glsl330/cubemap.fs generated/cubemap.330.fs)

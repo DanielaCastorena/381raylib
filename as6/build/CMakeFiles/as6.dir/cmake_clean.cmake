@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/as6.dir/src/main.cpp.o"
-  "CMakeFiles/as6.dir/src/main.cpp.o.d"
+  "CMakeFiles/as6.dir/src/as6.cpp.o"
+  "CMakeFiles/as6.dir/src/as6.cpp.o.d"
+  "CMakeFiles/as6.dir/src/skybox.cpp.o"
+  "CMakeFiles/as6.dir/src/skybox.cpp.o.d"
   "as6"
   "as6.pdb"
 )

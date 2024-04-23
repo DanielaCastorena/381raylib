@@ -8,7 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/Users/daniela_castorena/Desktop/381raylib/as6/src/main.cpp" "CMakeFiles/as6.dir/src/main.cpp.o" "gcc" "CMakeFiles/as6.dir/src/main.cpp.o.d"
+  "/Users/daniela_castorena/Desktop/381raylib/as6/src/as6.cpp" "CMakeFiles/as6.dir/src/as6.cpp.o" "gcc" "CMakeFiles/as6.dir/src/as6.cpp.o.d"
+  "/Users/daniela_castorena/Desktop/381raylib/as6/src/skybox.cpp" "CMakeFiles/as6.dir/src/skybox.cpp.o" "gcc" "CMakeFiles/as6.dir/src/skybox.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

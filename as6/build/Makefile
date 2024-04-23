@@ -272,29 +272,53 @@ libfastsignals/fast:
 	$(MAKE) $(MAKESILENT) -f raylib-cpp/BufferedRaylib/FastSignals/libfastsignals/CMakeFiles/libfastsignals.dir/build.make raylib-cpp/BufferedRaylib/FastSignals/libfastsignals/CMakeFiles/libfastsignals.dir/build
 .PHONY : libfastsignals/fast
 
-src/main.o: src/main.cpp.o
-.PHONY : src/main.o
+src/as6.o: src/as6.cpp.o
+.PHONY : src/as6.o
 
 # target to build an object file
-src/main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/as6.dir/build.make CMakeFiles/as6.dir/src/main.cpp.o
-.PHONY : src/main.cpp.o
+src/as6.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/as6.dir/build.make CMakeFiles/as6.dir/src/as6.cpp.o
+.PHONY : src/as6.cpp.o
 
-src/main.i: src/main.cpp.i
-.PHONY : src/main.i
+src/as6.i: src/as6.cpp.i
+.PHONY : src/as6.i
 
 # target to preprocess a source file
-src/main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/as6.dir/build.make CMakeFiles/as6.dir/src/main.cpp.i
-.PHONY : src/main.cpp.i
+src/as6.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/as6.dir/build.make CMakeFiles/as6.dir/src/as6.cpp.i
+.PHONY : src/as6.cpp.i
 
-src/main.s: src/main.cpp.s
-.PHONY : src/main.s
+src/as6.s: src/as6.cpp.s
+.PHONY : src/as6.s
 
 # target to generate assembly for a file
-src/main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/as6.dir/build.make CMakeFiles/as6.dir/src/main.cpp.s
-.PHONY : src/main.cpp.s
+src/as6.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/as6.dir/build.make CMakeFiles/as6.dir/src/as6.cpp.s
+.PHONY : src/as6.cpp.s
+
+src/skybox.o: src/skybox.cpp.o
+.PHONY : src/skybox.o
+
+# target to build an object file
+src/skybox.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/as6.dir/build.make CMakeFiles/as6.dir/src/skybox.cpp.o
+.PHONY : src/skybox.cpp.o
+
+src/skybox.i: src/skybox.cpp.i
+.PHONY : src/skybox.i
+
+# target to preprocess a source file
+src/skybox.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/as6.dir/build.make CMakeFiles/as6.dir/src/skybox.cpp.i
+.PHONY : src/skybox.cpp.i
+
+src/skybox.s: src/skybox.cpp.s
+.PHONY : src/skybox.s
+
+# target to generate assembly for a file
+src/skybox.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/as6.dir/build.make CMakeFiles/as6.dir/src/skybox.cpp.s
+.PHONY : src/skybox.cpp.s
 
 # Help Target
 help:
@@ -317,9 +341,12 @@ help:
 	@echo "... libfastsignals"
 	@echo "... raylib"
 	@echo "... tst"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
+	@echo "... src/as6.o"
+	@echo "... src/as6.i"
+	@echo "... src/as6.s"
+	@echo "... src/skybox.o"
+	@echo "... src/skybox.i"
+	@echo "... src/skybox.s"
 .PHONY : help
 
 

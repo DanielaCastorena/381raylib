@@ -69,33 +69,49 @@ include CMakeFiles/as6.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/as6.dir/flags.make
 
-CMakeFiles/as6.dir/src/main.cpp.o: CMakeFiles/as6.dir/flags.make
-CMakeFiles/as6.dir/src/main.cpp.o: /Users/daniela_castorena/Desktop/381raylib/as6/src/main.cpp
-CMakeFiles/as6.dir/src/main.cpp.o: CMakeFiles/as6.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/daniela_castorena/Desktop/381raylib/as6/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/as6.dir/src/main.cpp.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/as6.dir/src/main.cpp.o -MF CMakeFiles/as6.dir/src/main.cpp.o.d -o CMakeFiles/as6.dir/src/main.cpp.o -c /Users/daniela_castorena/Desktop/381raylib/as6/src/main.cpp
+CMakeFiles/as6.dir/src/as6.cpp.o: CMakeFiles/as6.dir/flags.make
+CMakeFiles/as6.dir/src/as6.cpp.o: /Users/daniela_castorena/Desktop/381raylib/as6/src/as6.cpp
+CMakeFiles/as6.dir/src/as6.cpp.o: CMakeFiles/as6.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/daniela_castorena/Desktop/381raylib/as6/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/as6.dir/src/as6.cpp.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/as6.dir/src/as6.cpp.o -MF CMakeFiles/as6.dir/src/as6.cpp.o.d -o CMakeFiles/as6.dir/src/as6.cpp.o -c /Users/daniela_castorena/Desktop/381raylib/as6/src/as6.cpp
 
-CMakeFiles/as6.dir/src/main.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/as6.dir/src/main.cpp.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/daniela_castorena/Desktop/381raylib/as6/src/main.cpp > CMakeFiles/as6.dir/src/main.cpp.i
+CMakeFiles/as6.dir/src/as6.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/as6.dir/src/as6.cpp.i"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/daniela_castorena/Desktop/381raylib/as6/src/as6.cpp > CMakeFiles/as6.dir/src/as6.cpp.i
 
-CMakeFiles/as6.dir/src/main.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/as6.dir/src/main.cpp.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/daniela_castorena/Desktop/381raylib/as6/src/main.cpp -o CMakeFiles/as6.dir/src/main.cpp.s
+CMakeFiles/as6.dir/src/as6.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/as6.dir/src/as6.cpp.s"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/daniela_castorena/Desktop/381raylib/as6/src/as6.cpp -o CMakeFiles/as6.dir/src/as6.cpp.s
+
+CMakeFiles/as6.dir/src/skybox.cpp.o: CMakeFiles/as6.dir/flags.make
+CMakeFiles/as6.dir/src/skybox.cpp.o: /Users/daniela_castorena/Desktop/381raylib/as6/src/skybox.cpp
+CMakeFiles/as6.dir/src/skybox.cpp.o: CMakeFiles/as6.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/daniela_castorena/Desktop/381raylib/as6/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/as6.dir/src/skybox.cpp.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/as6.dir/src/skybox.cpp.o -MF CMakeFiles/as6.dir/src/skybox.cpp.o.d -o CMakeFiles/as6.dir/src/skybox.cpp.o -c /Users/daniela_castorena/Desktop/381raylib/as6/src/skybox.cpp
+
+CMakeFiles/as6.dir/src/skybox.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/as6.dir/src/skybox.cpp.i"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/daniela_castorena/Desktop/381raylib/as6/src/skybox.cpp > CMakeFiles/as6.dir/src/skybox.cpp.i
+
+CMakeFiles/as6.dir/src/skybox.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/as6.dir/src/skybox.cpp.s"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/daniela_castorena/Desktop/381raylib/as6/src/skybox.cpp -o CMakeFiles/as6.dir/src/skybox.cpp.s
 
 # Object files for target as6
 as6_OBJECTS = \
-"CMakeFiles/as6.dir/src/main.cpp.o"
+"CMakeFiles/as6.dir/src/as6.cpp.o" \
+"CMakeFiles/as6.dir/src/skybox.cpp.o"
 
 # External object files for target as6
 as6_EXTERNAL_OBJECTS =
 
-as6: CMakeFiles/as6.dir/src/main.cpp.o
+as6: CMakeFiles/as6.dir/src/as6.cpp.o
+as6: CMakeFiles/as6.dir/src/skybox.cpp.o
 as6: CMakeFiles/as6.dir/build.make
 as6: raylib-cpp/raylib/raylib/libraylib.a
 as6: raylib-cpp/raylib/raylib/external/glfw/src/libglfw3.a
 as6: CMakeFiles/as6.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/daniela_castorena/Desktop/381raylib/as6/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable as6"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/daniela_castorena/Desktop/381raylib/as6/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable as6"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/as6.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
