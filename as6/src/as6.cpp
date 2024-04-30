@@ -1,280 +1,298 @@
-#include "raylib.h"
-#include "raymath.h"
+#include <raylib-cpp.hpp>
 
-#define VELOCITY_INCREMENT 0.1f
+#include <memory>
+#include <ranges>
+#include <iostream>
 
-typedef struct {
-    int entityId;
-    void (*setup)(void *componentData);
-    void (*tick)(void *componentData);
-    void (*update)(void *componentData);
-    void *data;
-} Component;
+// #include "inputs.hpp"
+#include "skybox.hpp"
 
-typedef struct {
-    int entityId;
-    Component *components;
-    int numComponents;
-} Entity;
+template<typename T>
+concept Transformer = requires(T t, raylib::Transform m) {
+	{ t.operator()(m) } -> std::convertible_to<raylib::Transform>;
+};
 
-typedef struct {
-    Vector3 position;
-    Vector3 velocity;
-    float heading;
-} TransformComponent;
+struct CalculateVelocityParams {
+	static constexpr float acceleration = 5;
+	static constexpr float angularAcceleration = 15;
 
-typedef struct {
-    float width;
-    float height;
-    float depth;
-} SizeComponent;
+	float targetSpeed;
+	raylib::Degree targetHeading;
+	float& speed;
+	raylib::Degree& heading;
+	float dt;
 
-typedef struct {
-    float maxSpeed;
-    float acceleration;
-    float turningRate;
-} MovementComponent;
+	float maxSpeed = 50;
+	float minSpeed = 0;
+};
 
-typedef struct {
-    Model model;
-    float scale;
-} GraphicsComponent;
+bool ProcessInput(raylib::Degree& planeTargetHeading, float& planeTargetSpeed, size_t& selectedPlane);
+raylib::Vector3 CaclulateVelocity(const CalculateVelocityParams& data);
+void DrawBoundedModel(raylib::Model& model, Transformer auto transformer);
+void DrawModel(raylib::Model& model, Transformer auto transformer);
 
-void transformSetup(void *componentData) {
-    TransformComponent *transform = (TransformComponent *)componentData;
-    transform->position = (Vector3){ 0 };
-    transform->velocity = (Vector3){ 0 };
-    transform->heading = 0.0f;
-}
 
-void transformTick(void *componentData) {
-    // No per-frame logic for transform component
-}
+int main() {
+	// Create window
+	const int screenWidth = 800 * 2;
+	const int screenHeight = 450 * 2;
+	raylib::Window window(screenWidth, screenHeight, "CS381 - Assignment 3");
+	// cs381::Inputs inputs(window);
 
-void transformUpdate(void *componentData) {
-    TransformComponent *transform = (TransformComponent *)componentData;
-    transform->position.x += transform->velocity.x;
-    transform->position.z += transform->velocity.z;
-}
+	// Create camera
+	auto camera = raylib::Camera(
+		raylib::Vector3(0, 120, -500), // Position
+		raylib::Vector3(0, 0, 300), // Target
+		raylib::Vector3::Up(), // Up direction
+		45.0f,
+		CAMERA_PERSPECTIVE
+	);
 
-void graphicsSetup(void *componentData) {
-    GraphicsComponent *graphics = (GraphicsComponent *)componentData;
-    graphics->model = LoadModel("meshes/PolyPlane.glb");
-    graphics->scale = 2.0f;
-}
+	// Create skybox
+	cs381::SkyBox skybox("textures/skybox.png");
 
-void graphicsTick(void *componentData) {
-    // No per-frame graphics logic
-}
+	// Create ground
+	auto mesh = raylib::Mesh::Plane(10000, 10000, 50, 50, 25);
+	raylib::Model ground = ((raylib::Mesh*)&mesh)->LoadModelFrom();
+	raylib::Texture grass("textures/water.jpg");
+	grass.SetFilter(TEXTURE_FILTER_BILINEAR);
+	grass.SetWrap(TEXTURE_WRAP_REPEAT);
+	ground.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = grass;
 
-void graphicsUpdate(void *componentData) {
-    GraphicsComponent *graphics = (GraphicsComponent *)componentData;
-    DrawModel(graphics->model, graphics->position, graphics->scale, WHITE);
-}
+	// Create airplane
+	raylib::Model plane("meshes/PolyPlane.glb");
+	// Set plane0 variables
+	raylib::Vector3 plane0Position = raylib::Vector3::Zero(), plane0Velocity = raylib::Vector3::Zero();
+	float plane0TargetSpeed = 0, plane0Speed = 0;
+	raylib::Degree plane0TargetHeading = 0, plane0Heading = 0;
+	// Set plane1 variables
+	raylib::Vector3 plane1Position = {-100, 0, 0}, plane1Velocity = raylib::Vector3::Zero();
+	float plane1TargetSpeed = 0, plane1Speed = 0;
+	raylib::Degree plane1TargetHeading = 0, plane1Heading = 0;
+	// Set plane2 variables
+	raylib::Vector3 plane2Position = {-50, 0, 0}, plane2Velocity = raylib::Vector3::Zero();
+	float plane2TargetSpeed = 0, plane2Speed = 0;
+	raylib::Degree plane2TargetHeading = 0, plane2Heading = 0;
+    // Set plane3 variables
+    raylib::Vector3 plane3Position = {0, 0, 50}, plane3Velocity = raylib::Vector3::Zero();
+    float plane3TargetSpeed = 0, plane3Speed = 0;
+    raylib::Degree plane3TargetHeading = 0, plane3Heading = 0;
+    // Set plane4 variables
+    raylib::Vector3 plane4Position = {0, 0, 100}, plane4Velocity = raylib::Vector3::Zero();
+    float plane4TargetSpeed = 0, plane4Speed = 0;
+    raylib::Degree plane4TargetHeading = 0, plane4Heading = 0;
 
-void movementSetup(void *componentData) {
-    MovementComponent *movement = (MovementComponent *)componentData;
-    movement->maxSpeed = 0.25f;
-    movement->acceleration = 0.02f;
-    movement->turningRate = 2.0f;
-}
+	size_t selectedPlane = 0;
 
-void movementTick(void *componentData) {
-    // No per-frame movement logic
-}
 
-void movementUpdate(void *componentData) {
-    MovementComponent *movement = (MovementComponent *)componentData;
-    movement->velocity.x += movement->acceleration;
-    movement->velocity.z += movement->acceleration;
-    
-    // Example: Limit velocity to maximum speed
-    if (movement->velocity.x > movement->maxSpeed) {
-        movement->velocity.x = movement->maxSpeed;
-    }
-    if (movement->velocity.z > movement->maxSpeed) {
-        movement->velocity.z = movement->maxSpeed;
-    }
-}
-void DrawBoundingBox(Vector3 position, float width, float height, float depth, Color color) {
-    Vector3 corners[8];
-    corners[0] = (Vector3){position.x - width / 2, position.y - height / 2, position.z - depth / 2};
-    corners[1] = (Vector3){position.x + width / 2, position.y - height / 2, position.z - depth / 2};
-    corners[2] = (Vector3){position.x + width / 2, position.y + height / 2, position.z - depth / 2};
-    corners[3] = (Vector3){position.x - width / 2, position.y + height / 2, position.z - depth / 2};
-    corners[4] = (Vector3){position.x - width / 2, position.y - height / 2, position.z + depth / 2};
-    corners[5] = (Vector3){position.x + width / 2, position.y - height / 2, position.z + depth / 2};
-    corners[6] = (Vector3){position.x + width / 2, position.y + height / 2, position.z + depth / 2};
-    corners[7] = (Vector3){position.x - width / 2, position.y + height / 2, position.z + depth / 2};
-
-    DrawLine3D(corners[0], corners[1], color);
-    DrawLine3D(corners[1], corners[2], color);
-    DrawLine3D(corners[2], corners[3], color);
-    DrawLine3D(corners[3], corners[0], color);
-
-    DrawLine3D(corners[4], corners[5], color);
-    DrawLine3D(corners[5], corners[6], color);
-    DrawLine3D(corners[6], corners[7], color);
-    DrawLine3D(corners[7], corners[4], color);
-
-    DrawLine3D(corners[0], corners[4], color);
-    DrawLine3D(corners[1], corners[5], color);
-    DrawLine3D(corners[2], corners[6], color);
-    DrawLine3D(corners[3], corners[7], color);
-}
-
-void updateEntitiesPositions(Entity *planes, Entity *ships) {
-    for (int i = 0; i < 5; i++) {
-        // Update planes' positions
-        for (int j = 0; j < planes[i].numComponents; j++) {
-            if (planes[i].components[j].update != NULL) {
-                planes[i].components[j].update(planes[i].components[j].data, &planes[i]);
-            }
+	// Main loop
+	bool keepRunning = true;
+	while(!window.ShouldClose() && keepRunning) {
+		// Updates
+		// Process input for the selected plane
+		switch(selectedPlane) {
+			break; case 0: keepRunning = ProcessInput(plane0TargetHeading, plane0TargetSpeed, selectedPlane); 
+			break; case 1: keepRunning = ProcessInput(plane1TargetHeading, plane1TargetSpeed, selectedPlane); 
+			break; case 2: keepRunning = ProcessInput(plane2TargetHeading, plane2TargetSpeed, selectedPlane); 
+            break; case 3: keepRunning = ProcessInput(plane3TargetHeading, plane3TargetSpeed, selectedPlane); 
+            break; case 4: keepRunning = ProcessInput(plane4TargetHeading, plane4TargetSpeed, selectedPlane); 
         }
-        // Update ships' positions
-        for (int j = 0; j < ships[i].numComponents; j++) {
-            if (ships[i].components[j].update != NULL) {
-                ships[i].components[j].update(ships[i].components[j].data, &ships[i]);
-            }
-        }
-    }
-}
+		
+		// Apply simple physics to plane0
+		plane0Velocity = CaclulateVelocity({
+			.targetSpeed = plane0TargetSpeed,
+			.targetHeading = plane0TargetHeading,
+			.speed = plane0Speed,
+			.heading = plane0Heading,
+			.dt = window.GetFrameTime()
+		});
+		plane0Position = plane0Position + plane0Velocity * window.GetFrameTime();
+		auto plane0Transformer = [plane0Position, plane0Heading](raylib::Transform transform) {
+			return transform.Translate(plane0Position).RotateY(raylib::Degree(plane0Heading));
+		};
 
-int main(void) {
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+		// Apply simple physics to plane1
+		plane1Velocity = CaclulateVelocity(CalculateVelocityParams{
+			.targetSpeed = plane1TargetSpeed,
+			.targetHeading = plane1TargetHeading,
+			.speed = plane1Speed,
+			.heading = plane1Heading,
+			.dt = window.GetFrameTime()
+		});
+		plane1Position = plane1Position + plane1Velocity * window.GetFrameTime();
+		auto plane1Transformer = [plane1Position, plane1Heading](raylib::Transform transform) {
+			return transform.Translate(plane1Position).RotateY(raylib::Degree(plane1Heading));
+		};
 
-    InitWindow(screenWidth, screenHeight, "CS381 - Assignment 8");
+		// Apply simple physics to plane2
+		plane2Velocity = CaclulateVelocity(CalculateVelocityParams{
+			.targetSpeed = plane2TargetSpeed,
+			.targetHeading = plane2TargetHeading,
+			.speed = plane2Speed,
+			.heading = plane2Heading,
+			.dt = window.GetFrameTime()
+		});
+		plane2Position = plane2Position + plane2Velocity * window.GetFrameTime();
+		auto plane2Transformer = [plane2Position, plane2Heading](raylib::Transform transform) {
+			return transform.Translate(plane2Position).RotateY(raylib::Degree(plane2Heading));
+		};
+        plane3Velocity = CaclulateVelocity(CalculateVelocityParams{
+            .targetSpeed = plane3TargetSpeed,
+            .targetHeading = plane3TargetHeading,
+            .speed = plane3Speed,
+            .heading = plane3Heading,
+            .dt = window.GetFrameTime()
+        });
+        plane3Position = plane3Position + plane3Velocity * window.GetFrameTime();
+        auto plane3Transformer = [plane3Position, plane3Heading](raylib::Transform transform) {
+            return transform.Translate(plane3Position).RotateY(raylib::Degree(plane3Heading));
+        };
 
-    Camera camera = { 0 };
-    camera.position = (Vector3){ 0.0f, 30.0f, -1000.0f };
-    camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
-    camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
-    camera.fovy = 30.0f;
-    camera.projection = CAMERA_PERSPECTIVE;
+        // Apply simple physics to plane4
+        plane4Velocity = CaclulateVelocity(CalculateVelocityParams{
+            .targetSpeed = plane4TargetSpeed,
+            .targetHeading = plane4TargetHeading,
+            .speed = plane4Speed,
+            .heading = plane4Heading,
+            .dt = window.GetFrameTime()
+        });
+        plane4Position = plane4Position + plane4Velocity * window.GetFrameTime();
+        auto plane4Transformer = [plane4Position, plane4Heading](raylib::Transform transform) {
+            return transform.Translate(plane4Position).RotateY(raylib::Degree(plane4Heading));
+        };
 
-    bool wBuffered = false;
-    bool sBuffered = false;
-    bool aBuffered = false;
-    bool dBuffered = false;
+		// Rendering
+		window.BeginDrawing();
+		{
+			// Clear screen
+			window.ClearBackground(BLACK);
 
-    Texture2D skyboxTexture = LoadTexture("textures/skybox.png");
-    Texture2D waterTexture = LoadTexture("textures/water.jpg");
+			camera.BeginMode();
+			{
+				// Render skybox and ground
+				skybox.Draw();
+				ground.Draw({});
 
-    Entity planes[5];
-    Entity ships[5];
-
-    for (int i = 0; i < 5; i++) {
-        planes[i].entityId = i;
-        planes[i].numComponents = 2;
-        planes[i].components = malloc(sizeof(Component) * planes[i].numComponents);
-
-        planes[i].components[0].setup = transformSetup;
-        planes[i].components[0].tick = transformTick;
-        planes[i].components[0].update = transformUpdate;
-        planes[i].components[0].data = malloc(sizeof(TransformComponent));
-
-        planes[i].components[1].setup = graphicsSetup;
-        planes[i].components[1].tick = graphicsTick;
-        planes[i].components[1].update = graphicsUpdate;
-        planes[i].components[1].data = malloc(sizeof(GraphicsComponent));
-
-        for (int j = 0; j < planes[i].numComponents; j++) {
-            planes[i].components[j].setup(planes[i].components[j].data);
-        }
-    }
-
-// Similar setup for ships
-for (int i = 0; i < 5; i++) {
-    ships[i].entityId = i;
-    ships[i].numComponents = 2; // Assuming ships have similar components as planes
-    ships[i].components = malloc(sizeof(Component) * ships[i].numComponents);
-
-    ships[i].components[0].setup = transformSetup;
-    ships[i].components[0].tick = transformTick;
-    ships[i].components[0].update = transformUpdate;
-    ships[i].components[0].data = malloc(sizeof(TransformComponent));
-
-    ships[i].components[1].setup = graphicsSetup;
-    ships[i].components[1].tick = graphicsTick;
-    ships[i].components[1].update = graphicsUpdate;
-    ships[i].components[1].data = malloc(sizeof(GraphicsComponent));
-
-    for (int j = 0; j < ships[i].numComponents; j++) {
-        ships[i].components[j].setup(ships[i].components[j].data);
-    }
-}
-
-while (!WindowShouldClose()) {
-    if (IsKeyPressed(KEY_TAB)) {
-        // Switch selected index
-    }
-
-    if (IsKeyPressed(KEY_W)) {
-        // Handle key press
-    }
-
-    // Similar handling for other keys
-
-    updateEntitiesPositions(planes, ships);
-
-    BeginDrawing();
-    {
-        ClearBackground(RAYWHITE);
-
-        // Draw water texture
-        DrawTexturePro(waterTexture, 
-                    (Rectangle){0, 0, static_cast<float>(waterTexture.width), static_cast<float>(waterTexture.height - 50)}, 
-                    (Rectangle){0, static_cast<float>(screenHeight) / 2 + 50, static_cast<float>(screenWidth), static_cast<float>(screenHeight) / 2 - 50},
-                    (Vector2){0, 0}, 0, WHITE);
-
-        BeginMode3D(camera);
-        {
-            // Draw skybox texture
-            float skyboxPosX = (screenWidth - skyboxTexture.width * 4) / 2;
-            float skyboxPosY = (screenHeight - skyboxTexture.height * 4) / 2 + 200;
-
-            DrawTexturePro(skyboxTexture, 
-                        (Rectangle){0, 0, static_cast<float>(skyboxTexture.width), static_cast<float>(skyboxTexture.height)},
-                        (Rectangle){skyboxPosX, skyboxPosY, 
-                                    static_cast<float>(skyboxTexture.width * 4), 
-                                    static_cast<float>(skyboxTexture.height * 4)}, 
-                        (Vector2){0, static_cast<float>(skyboxTexture.height)}, 
-                        0, WHITE);
-
-                for (int i = 0; i < 5; i++) {
-                    for (int j = 0; j < planes[i].numComponents; j++) {
-                        planes[i].components[j].update(planes[i].components[j].data);
+				// Draw the planes with a bounding box around the selected plane
+				switch(selectedPlane) {
+					break; case 0: {
+						DrawBoundedModel(plane, plane0Transformer);
+						DrawModel(plane, plane1Transformer);
+						DrawModel(plane, plane2Transformer);
+					} break; case 1: {
+						DrawModel(plane, plane0Transformer);
+						DrawBoundedModel(plane, plane1Transformer);
+						DrawModel(plane, plane2Transformer);
+					} break; case 2: {
+						DrawModel(plane, plane0Transformer);
+						DrawModel(plane, plane1Transformer);
+						DrawBoundedModel(plane, plane2Transformer);
+					}
+                        break; case 3: {
+                        DrawModel(plane, plane0Transformer);
+                        DrawModel(plane, plane1Transformer);
+                        DrawModel(plane, plane2Transformer);
+                        DrawBoundedModel(plane, plane3Transformer);
+                        DrawModel(plane, plane4Transformer);
+                    } break; case 4: {
+                        DrawModel(plane, plane0Transformer);
+                        DrawModel(plane, plane1Transformer);
+                        DrawModel(plane, plane2Transformer);
+                        DrawModel(plane, plane3Transformer);
+                        DrawBoundedModel(plane, plane4Transformer);
                     }
+				}
+			}
+			camera.EndMode();
 
-                    // Draw bounding boxes
-                    DrawBoundingBox(*(Vector3 *)(planes[i].components[0].data),
-                                    ((TransformComponent *)(planes[i].components[0].data))->position.x * 8,
-                                    ((TransformComponent *)(planes[i].components[0].data))->position.y * 2,
-                                    ((TransformComponent *)(planes[i].components[0].data))->position.z * 4,
-                                    RED);
-                }
-            }
-            EndMode3D();
-        }
-        EndDrawing();
-    }
+			// Measure our FPS
+			DrawFPS(10, 10);
+		}
+		window.EndDrawing();
+	}
 
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < planes[i].numComponents; j++) {
-            free(planes[i].components[j].data);
-        }
-        free(planes[i].components);
-    }
+	return 0;
+}
 
-    // Unload resources
-    for (int i = 0; i < 5; i++) {
-        UnloadModel(((GraphicsComponent *)(planes[i].components[1].data))->model);
-    }
-    UnloadTexture(skyboxTexture);
-    UnloadTexture(waterTexture);
+// Input handling
+bool ProcessInput(raylib::Degree& planeTargetHeading, float& planeTargetSpeed, size_t& selectedPlane) {
+	static bool wPressedLastFrame = false, sPressedLastFrame = false;
+	static bool aPressedLastFrame = false, dPressedLastFrame = false;
+	static bool tabPressedLastFrame = false;
 
-    CloseWindow();
+	// If we hit escape... shutdown
+	if(IsKeyDown(KEY_ESCAPE))
+		return false;
 
-    return 0;
+	// WASD updates plane velocity
+	if(IsKeyDown(KEY_W) && !wPressedLastFrame)
+		planeTargetSpeed += 1;
+	if(IsKeyDown(KEY_S) && !sPressedLastFrame)
+		planeTargetSpeed -= 1;
+	if(IsKeyDown(KEY_A) && !aPressedLastFrame)
+		planeTargetHeading += 5;
+	if(IsKeyDown(KEY_D) && !dPressedLastFrame)
+		planeTargetHeading -= 5;  
+
+	// Space sets velocity to 0!
+	if(IsKeyDown(KEY_SPACE))
+		planeTargetSpeed = 0;
+
+	// Tab selects the next plane
+	if(IsKeyDown(KEY_TAB) && !tabPressedLastFrame)
+		selectedPlane = (selectedPlane + 1) % 3;
+
+	// Save the state of the key for next frame
+	wPressedLastFrame = IsKeyDown(KEY_W);
+	sPressedLastFrame = IsKeyDown(KEY_S);
+	aPressedLastFrame = IsKeyDown(KEY_A);
+	dPressedLastFrame = IsKeyDown(KEY_D);
+
+	tabPressedLastFrame = IsKeyDown(KEY_TAB);
+
+	return true;
+}
+
+raylib::Vector3 CaclulateVelocity(const CalculateVelocityParams& data) {
+	static constexpr auto AngleClamp = [](raylib::Degree angle) -> raylib::Degree {
+		float decimal = float(angle) - int(angle);
+		int whole = int(angle) % 360;
+		whole += (whole < 0) * 360;
+		return decimal + whole;
+	};
+
+	float target = Clamp(data.targetSpeed, data.minSpeed, data.maxSpeed);
+	if(data.speed < target) data.speed += data.acceleration * data.dt;
+	else if(data.speed > target) data.speed -= data.acceleration * data.dt;
+	data.speed = Clamp(data.speed, data.minSpeed, data.maxSpeed);
+
+	target = AngleClamp(data.targetHeading);
+	float difference = abs(target - data.heading);
+	if(target > data.heading) {
+		if(difference < 180) data.heading += data.angularAcceleration * data.dt;
+		else if(difference > 180) data.heading -= data.angularAcceleration * data.dt;
+	} else if(target < data.heading) {
+		if(difference < 180) data.heading -= data.angularAcceleration * data.dt;
+		else if(difference > 180) data.heading += data.angularAcceleration * data.dt;
+	} 
+	if(difference < .5) data.heading = target; // If the heading is really close to correct 
+	data.heading = AngleClamp(data.heading);
+	raylib::Radian angle = raylib::Degree(data.heading);
+
+	return {cos(angle) * data.speed, 0, -sin(angle) * data.speed};
+}
+
+void DrawBoundedModel(raylib::Model& model, Transformer auto transformer) {
+	raylib::Transform backupTransform = model.transform;
+	model.transform = transformer(backupTransform);
+	model.Draw({});
+	model.GetTransformedBoundingBox().Draw();
+	model.transform = backupTransform;
+}
+
+void DrawModel(raylib::Model& model, Transformer auto transformer) {
+	raylib::Transform backupTransform = model.transform;
+	model.transform = transformer(backupTransform);
+	model.Draw({});
+	model.transform = backupTransform;
 }

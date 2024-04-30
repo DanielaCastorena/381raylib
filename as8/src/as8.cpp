@@ -390,5 +390,3 @@ void decreasePitchPlane(Plane *plane) {
     plane->pitch -= VELOCITY_INCREMENT * plane->turningRate;
     if (plane->pitch < 0) plane->pitch += 360;
 }
-
-
