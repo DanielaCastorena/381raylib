@@ -28,3 +28,6 @@
 [submodule "as9/raylib-cpp"]
 	path = as9/raylib-cpp
 	url = https://github.com/joshuadahlunr/raylib-cpp.git
+[submodule "as10/godot-cpp20"]
+	path = as10/godot-cpp20
+	url = https://github.com/hpcvis/godot-cpp20
