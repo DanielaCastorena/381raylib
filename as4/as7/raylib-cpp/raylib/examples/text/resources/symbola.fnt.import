@@ -1,0 +1,17 @@
+[remap]
+
+importer="font_data_bmfont"
+type="FontFile"
+uid="uid://bnesg6l4rntq7"
+path="res://.godot/imported/symbola.fnt-4547e50ace6d1a6c661893692b0a929a.fontdata"
+
+[deps]
+
+source_file="res://381raylib/as4/as7/raylib-cpp/raylib/examples/text/resources/symbola.fnt"
+dest_files=["res://.godot/imported/symbola.fnt-4547e50ace6d1a6c661893692b0a929a.fontdata"]
+
+[params]
+
+fallbacks=[]
+compress=true
+scaling_mode=2

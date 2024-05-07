@@ -1,0 +1,5 @@
+MainGame (Control)
+|- IncreaseButton (Button)
+|- DecreaseButton (Button)
+|- PlayerListLabel (Label)
+|- SharedValueLabel (Label)

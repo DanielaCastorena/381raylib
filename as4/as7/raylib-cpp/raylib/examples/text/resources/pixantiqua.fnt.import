@@ -1,0 +1,17 @@
+[remap]
+
+importer="font_data_bmfont"
+type="FontFile"
+uid="uid://yqrmilgjyptx"
+path="res://.godot/imported/pixantiqua.fnt-665723bfc558737258b48f86eb8fcfca.fontdata"
+
+[deps]
+
+source_file="res://381raylib/as4/as7/raylib-cpp/raylib/examples/text/resources/pixantiqua.fnt"
+dest_files=["res://.godot/imported/pixantiqua.fnt-665723bfc558737258b48f86eb8fcfca.fontdata"]
+
+[params]
+
+fallbacks=[]
+compress=true
+scaling_mode=2

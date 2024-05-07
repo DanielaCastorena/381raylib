@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://bjv8etj8pvv55"
+path="res://.godot/imported/gol.glsl-079ce87197afae6136886c1955a0887a.res"
+
+[deps]
+
+source_file="res://381raylib/as4/as7/raylib-cpp/raylib/examples/others/resources/shaders/glsl430/gol.glsl"
+dest_files=["res://.godot/imported/gol.glsl-079ce87197afae6136886c1955a0887a.res"]
+
+[params]
+

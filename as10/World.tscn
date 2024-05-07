@@ -1,0 +1,75 @@
+[gd_scene load_steps=3 format=3 uid="uid://c1ywndjg4hd37"]
+
+[ext_resource type="Script" path="res://RemoteLabel.gd" id="1_cribd"]
+[ext_resource type="Script" path="res://Networking.gd" id="1_tghi0"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Game" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Label" type="Label" parent="Game"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 28.825
+anchor_bottom = 16.2
+offset_right = -3.05176e-05
+offset_bottom = -3.05176e-05
+grow_horizontal = 2
+grow_vertical = 2
+text = "Counter: 0"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("1_cribd")
+
+[node name="HostMenu" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_tghi0")
+
+[node name="PanelContainer" type="PanelContainer" parent="HostMenu"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 28.8
+anchor_bottom = 16.2
+offset_left = 348.0
+offset_top = 106.0
+offset_right = -288.0
+offset_bottom = -128.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HostMenu/PanelContainer"]
+layout_mode = 2
+
+[node name="Spacer2" type="Control" parent="HostMenu/PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HostButton" type="Button" parent="HostMenu/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Host
+"
+
+[node name="IPAddress" type="LineEdit" parent="HostMenu/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "localhost"
+
+[node name="JoinButton" type="Button" parent="HostMenu/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Join
+"
+
+[node name="Spacer" type="Control" parent="HostMenu/PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[connection signal="pressed" from="HostMenu/PanelContainer/VBoxContainer/HostButton" to="HostMenu" method="_on_host_button_pressed"]
+[connection signal="pressed" from="HostMenu/PanelContainer/VBoxContainer/JoinButton" to="HostMenu" method="_on_join_button_pressed"]

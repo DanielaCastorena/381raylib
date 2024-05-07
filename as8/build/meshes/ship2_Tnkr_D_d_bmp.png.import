@@ -1,0 +1,37 @@
+[remap]
+
+importer="texture"
+type="CompressedTexture2D"
+uid="uid://cllyc3d50aywo"
+path="res://.godot/imported/ship2_Tnkr_D_d_bmp.png-9bee88d842036edd3c3855866241b9ad.ctex"
+metadata={
+"vram_texture": false
+}
+generator_parameters={
+"md5": "15d5bd9d0bc01070a2583706073aa314"
+}
+
+[deps]
+
+source_file="res://381raylib/as8/build/meshes/ship2_Tnkr_D_d_bmp.png"
+dest_files=["res://.godot/imported/ship2_Tnkr_D_d_bmp.png-9bee88d842036edd3c3855866241b9ad.ctex"]
+
+[params]
+
+compress/mode=0
+compress/high_quality=false
+compress/lossy_quality=0.7
+compress/hdr_compression=1
+compress/normal_map=0
+compress/channel_pack=0
+mipmaps/generate=true
+mipmaps/limit=-1
+roughness/mode=0
+roughness/src_normal=""
+process/fix_alpha_border=true
+process/premult_alpha=false
+process/normal_map_invert_y=false
+process/hdr_as_srgb=false
+process/hdr_clamp_exposure=false
+process/size_limit=0
+detect_3d/compress_to=1
